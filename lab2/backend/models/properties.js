@@ -1,6 +1,6 @@
 var mongoose =require('mongoose');
 
-var Property= mongoose.model('',{
+var Property= mongoose.model('Property',{
     address :{
         type : String
     },
@@ -37,16 +37,15 @@ var Property= mongoose.model('',{
     currency: {
         type : String
             },
-
     baseRate :{
          type : String
             },
     owner: {
              type : String
             },
-    iamges: {
+    images: {
                 type : String
-                    }
+                 }
 },"Property")
 
 module.exports = {Property};
