@@ -62,7 +62,7 @@ class Header extends Component {
     if (this.props.authFlag) {
       let details = this.props.userinfo.map(info => {
         return(
-            <span>{info.user.email}</span>
+            <span>{info.user.firstName}</span>
       )})
       // var details
       //  details = this.props.userinfo.map(book => {

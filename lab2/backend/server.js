@@ -189,6 +189,7 @@ app.post('/login', function (request, response) {
             crypt.compareHash(request.body.password, row.password, function (err, isMatch) {
                 console.log("inside compare hash");
                 if (isMatch && !err) {
+                    console.log("is matched true")
                     var token = jwt.sign(user, config.secret, {
                         expiresIn: 10080 // in seconds
                     });
@@ -201,16 +202,8 @@ app.post('/login', function (request, response) {
                     }
                     response.status(200).json({ success: true, token: 'JWT ' + token , resData});
                 }
-                else {
-                  
-                //     console.log("err is " + err)
-                //    // response.statusMessage = "Authentication failed 1. Passwords did not match.";
-                //    response.writeHead(401,{
-                //        "Content-Type": "text/plain"
-                //    });
-                //    response.end("Password did not match.")
-
-
+            else
+                {  console.log("inside err" ,err)
                    response.statusMessage = "Password did not match.";
                    response.status(401).end();
                 }

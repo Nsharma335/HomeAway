@@ -28,35 +28,73 @@ var {mongoose}= require('./db/mongoose');
 //     console.log('connected as id ' + connection.threadId);
 // });
 
-db.createUser = function (user, successCallback, failureCallback) {
-    console.log("registering users in Database..")
-    pool.getConnection(function (err, connection) {
-        console.log("pool connection started..")
-        var passwordHash;
+// db.createUser = function (user, successCallback, failureCallback) {
+//     console.log("registering users in Database..")
+//     pool.getConnection(function (err, connection) {
+//         console.log("pool connection started..")
+//         var passwordHash;
 
+//         crypt.createHash(user.password, function (res) {
+//             passwordHash = res;
+//             var query = "INSERT INTO UserTable (email,firstName,lastname,password) VALUES ( " + mysql.escape(user.email) + " , " +
+//                 mysql.escape(user.firstName) + " , " + mysql.escape(user.lastName) + " , " + mysql.escape(passwordHash) + " ); "
+//             connection.query(query,
+//                 function (err, result) {
+//                     if (err) {
+//                         console.log(err);
+//                         failureCallback(err);
+//                         return;
+//                     }
+//                     console.log("query", query);
+//                     successCallback();
+//                 });
+
+//         }, function (err) {
+//             console.log(err);
+//             failureCallback();
+//         });
+//         connection.release();
+//     });
+
+// };
+
+db.createUser = function (user, successCallback, failureCallback) {
+    console.log("registering users in Mongo Database..")
+        var passwordHash;
+        console.log("email" , user.email)
         crypt.createHash(user.password, function (res) {
             passwordHash = res;
-            var query = "INSERT INTO UserTable (email,firstName,lastname,password) VALUES ( " + mysql.escape(user.email) + " , " +
-                mysql.escape(user.firstName) + " , " + mysql.escape(user.lastName) + " , " + mysql.escape(passwordHash) + " ); "
-            connection.query(query,
-                function (err, result) {
-                    if (err) {
-                        console.log(err);
-                        failureCallback(err);
-                        return;
-                    }
-                    console.log("query", query);
-                    successCallback();
-                });
-
+            var newUser = new User({
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                password: passwordHash
+            });
+            User.findOne({
+                email:user.email
+            }).then(function(userExist,err){
+            if(userExist){
+                failureCallback("User already registered")
+            }
+            else{
+        
+            newUser.save().then((user)=> {
+                console.log("User created : ", user);
+                successCallback()
+                //res.sendStatus(200).end();
+            }, (err) => {
+                console.log("Error Creating User");
+                failureCallback();
+                //res.sendStatus(400).end();
+            })
+        }
         }, function (err) {
             console.log(err);
             failureCallback();
-        });
-        connection.release();
+      
     });
+})};
 
-};
 
 db.findUser = function (userInfo, successCallback, failureCallback) {
     console.log("Finding user in database..")

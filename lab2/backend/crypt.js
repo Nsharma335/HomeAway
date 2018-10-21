@@ -22,6 +22,7 @@ crypt.createHash = function (data, successCallback, failureCallback) {
 crypt.compareHash = function (data, encrypted, successCallback, failureCallback) {
     bcrypt.compare(data, encrypted, function (err, isMatch) {
         if (err) {
+            console.log("cyrpt did not match..")
             failureCallback(err);
             return;
         }
