@@ -5,11 +5,10 @@ import Swal from 'sweetalert2';
 import HeaderBlue from './HeaderBlue';
 import Search from './Search';
 import { BrowserRouter as Router } from 'react-router-dom';
+import {Redirect} from 'react-router'; 
+import { connect } from 'react-redux';
 
-
-
-
-export default class ViewProperty extends Component {
+class ViewProperty extends Component {
     constructor() {
         super();
         this.state = {
@@ -25,59 +24,11 @@ export default class ViewProperty extends Component {
         window.location.href = "http://localhost:3000/bookProperty"
     }
 
-    async componentDidMount() {
-        var self = this;
-        const data = {
-            location: localStorage.getItem("location"), checkin: localStorage.getItem("checkin"),
-            checkout: localStorage.getItem("checkout"), guests: localStorage.getItem("guests")
-        };
-        console.log("sending data" + JSON.stringify(data));
-        axios.post("http://localhost:3001/searchProperty", data)
-            .then(async (response) => {
-                var imagesnames = response.data;
-                for (var i = 0; i < imagesnames; i++) {
-                    var images = imagesnames[i];
-
-                    var splitImage = images.split(',');
-                    console.log("splited" + splitImage);
-                    var joinimage = [];
-                    joinimage.length = 0;
-                    for (var j = 0; j < splitImage.length; j++) {
-                        await axios.post('http://localhost:3001/download/' + splitImage)
-                            .then(async (response) => {
-
-                                var imagePreview = 'data:image/jpeg;base64, ' + response.data;
-                                joinimage.push(imagePreview);
-                                images = imagePreview
-                                this.setState({ imagesPreview: images })
-                                console.log(joinimage)
-                            });
-                    }
-                    imagesnames[i].images = images
-                }
-
-                console.log("array of files" + imagesnames);
-                if (response.data.rows != null) {
-                    console.log(response);
-                    self.setState({
-                        data: response.data.rows
-                    })
-                }
-                if (response.status === 204) {
-                    console.log("hey data is not present");
-                    console.log(response)
-                    Swal('No Results Found', response.data.message, 'error');
-
-                }
-            })
-
-    }
-
     render() {
         let propertytList;
 
 
-        propertytList = this.state.data.map(property => {
+        propertytList = this.props.searchResults.map(property => {
 
             return (
                 <div>
@@ -91,7 +42,7 @@ export default class ViewProperty extends Component {
                         <div className="row">
                             <div className="col-sm-2" >
 
-                                <img src={require(`../Components/uploads/${property.images}`)} height="100px" />
+                                {/* <img src={require(`../Components/uploads/${property.images}`)} height="100px" /> */}
                                 {/* <img src={this.state.imagesPreview} height="100px" /> */}
                             </div>
                             <div className="col-sm-10 nameview">
@@ -132,3 +83,14 @@ export default class ViewProperty extends Component {
 
     }
 }
+
+const mapStateToProps = state =>{
+    //console.log("State", state)
+  
+    console.log("State in view property searchresults..", state.searchResults)
+    return {
+        searchResults : state.searchResults
+    }
+}
+
+export default connect(mapStateToProps)(ViewProperty);

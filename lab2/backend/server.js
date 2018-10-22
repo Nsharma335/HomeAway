@@ -263,7 +263,7 @@ app.post('/login', function (request, response) {
 
 app.post('/searchProperty', function (request, response) {
 
-    console.log("Request search property for User : " + request.body.firstName);
+    console.log("Request search property for User : " );
     var data = {
         location: request.body.location, checkin: request.body.checkin, checkout: request.body.checkout,
         guests: request.body.guests

@@ -1,8 +1,11 @@
 import React, { Component } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {Redirect} from 'react-router'; 
+import { connect } from 'react-redux';
+import axios from 'axios';
+import Swal from 'sweetalert2'
 
-
-export default class Search extends Component {
+class Search extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -51,35 +54,37 @@ export default class Search extends Component {
 
     saveFormData(e) {
         e.preventDefault();
-        debugger
-        localStorage.setItem("location", this.state.location);
-        localStorage.setItem("checkin", this.state.checkin);
-        localStorage.setItem("checkout", this.state.checkout);
-        localStorage.setItem("guests", this.state.guests);
-        // this.props.history.push("/viewProperty")
-        window.location.href = "http://localhost:3000/viewProperty";
+        var data= {
+            location : this.state.location,
+            checkin :this.state.checkin,
+            checkout : this.state.checkout,
+            guests : this.state.guests
+        }
+        this.props.onSubmitHandle(data)
     }
 
 
     render() {
-        console.log(this.state.location)
-        console.log("checkin" + localStorage.getItem("checkin"));
-        console.log("checkout" + localStorage.getItem("checkout"));
-        console.log(this.state.guests)
+        let redirect=null;
+        if(this.props.searchedProperty)
+        {
+            redirect = <Redirect to="/viewProperty" />
+        }
         return (
             <div>
+                {redirect}
                 <form className="form-inline" style={{ marginBottom: "200px" }}>
                     <div className="form-group form-group-lg">
-                        <input type="text" onChange={this.locationChangeHandler} className="form-control" value={localStorage.getItem("location")} name="location" placeholder="Where do you want to go?" style={{ width: "350px" }}></input>
+                        <input type="text" onChange={this.locationChangeHandler} className="form-control" value={this.state.location} name="location" placeholder="Where do you want to go?" style={{ width: "350px" }}></input>
                     </div>
                     <div className="form-group form-group-lg">
-                        <input type="date" onChange={this.checkInHandler} className="form-control" value={localStorage.getItem("checkin")} name="checkin" placeholder="Arrive" style={{ width: "195px" }}></input>
+                        <input type="date" onChange={this.checkInHandler} className="form-control" value={this.state.checkin} name="checkin" placeholder="Arrive" style={{ width: "195px" }}></input>
                     </div>
                     <div className="form-group form-group-lg">
-                        <input type="date" onChange={this.checkOutHandler} className="form-control" value={localStorage.getItem("checkout")} name="checkout" placeholder="Depart" style={{ width: "195px" }}></input>
+                        <input type="date" onChange={this.checkOutHandler} className="form-control" value={this.state.checkout} name="checkout" placeholder="Depart" style={{ width: "195px" }}></input>
                     </div>
                     <div className="form-group form-group-lg">
-                        <input type="text" onChange={this.guestHandler} className="form-control" value={localStorage.getItem("guests")} name="guests" placeholder="Guests" style={{ width: "100px", }}></input>
+                        <input type="text" onChange={this.guestHandler} className="form-control" value={this.state.guests} name="guests" placeholder="Guests" style={{ width: "100px", }}></input>
                     </div>
                     <button type="submit" className="btn btn-lg" onClick={this.saveFormData}>Search </button>
                 </form>
@@ -87,3 +92,28 @@ export default class Search extends Component {
         )
     }
 }
+
+
+const mapStateToProps = state =>{
+    //console.log("State", state)
+    console.log("State serachdetails data...", state.searched)
+    return {
+        searchedProperty : state.searched
+
+    }
+}
+    const mapDispatchStateToProps = dispatch => {
+        return {
+            onSubmitHandle : (data) => {
+                axios.post('http://localhost:3001/searchProperty', data,{ withCredentials: true })
+                    .then((response) => {
+                            console.log("response fetched ROWS..", response.data.rows)
+                            dispatch({type: 'SEARCH_RESULTS',payload :response.data.rows, statusCode : response.status})
+                          
+                })
+            }
+        }
+    }
+
+
+export default connect(mapStateToProps,mapDispatchStateToProps)(Search);

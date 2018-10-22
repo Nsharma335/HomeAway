@@ -25,7 +25,7 @@ var Property= mongoose.model('Property',{
     availableFrom: {
         type : String
     },
-    avialableTo :{
+    availableTo :{
         type : String
     },
     propertyType :{

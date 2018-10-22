@@ -4,8 +4,8 @@
 var crypt = require('./crypt');
 var config = require('./settings');
 var db = {};
-var {User} = require('./models/user');
-var {Property} = require('./models/properties');
+var {User} = require('./models/User');
+var {Property} = require('./models/Property');
 var mongoose = require("mongoose");
 var {mongoose}= require('./db/mongoose');
 
@@ -102,6 +102,28 @@ db.findUser = function (userInfo, successCallback, failureCallback) {
 
 // };
 
+db.searchProperty = function (property, successCallback, failureCallback) {
+    Property.find({
+    address: property.data.location,
+    availableFrom :{ $lte: property.data.checkin},
+    availableTo : {$gte: property.data.checkout} 
+    }
+    ).then(function (propertyFound,err) {
+            if (propertyFound) {
+                console.log("successCallback callback 2")
+                console.log("rows generated are" + propertyFound)
+                successCallback(propertyFound)
+            }
+            else {
+                console.log("failure callback 2")
+                failureCallback('Property Match not found.');
+            }   
+    }, function(err){
+        console.log("error is",err)
+        failureCallback(err)
+    })
+};
+
 db.updateProfile = function (form_values, successCallback, failureCallback) {
     console.log("Updating profile of user : " + form_values.firstName)
     pool.getConnection(function (err, connection) {
@@ -131,42 +153,11 @@ db.updateProfile = function (form_values, successCallback, failureCallback) {
     //connection.release();
 };
 
-
-
-// db.submitProperty = function (property, successCallback, failureCallback) {
-//     console.log("Creating property inside database....")
-//     const insertQueryString =
-//         "INSERT INTO `Homeaway`.`property` (address,headline,description,bedroom,bathroom,accomodates,amenities,availableFrom,availableTo,propertyType,currency,baseRate,owner) VALUES ( " + mysql.escape(property.address) + " , " +
-//         mysql.escape(property.headline) + " , " +
-//         mysql.escape(property.description) + " , " + mysql.escape(property.bedroom) + " , " +
-//         mysql.escape(property.bathroom) + " , " + mysql.escape(property.accomodates) + " , " +
-//         mysql.escape(property.amenities) + " , " + mysql.escape(property.availableFrom) + " , " +
-//         mysql.escape(property.availableTo) + " , " +
-//         mysql.escape(property.propertyType) + " , " + mysql.escape(property.currency) + " , " +
-//         mysql.escape(property.baseRate) + " , " + mysql.escape(property.email) + " ); "
-
-//     pool.getConnection(function (err, connection) {
-//         connection.query(insertQueryString,
-//             function (err) {
-//                 if (err) {
-//                     console.log(err);
-//                     failureCallback(err);
-//                     return;
-//                 }
-//                 console.log("Property Created successfully")
-//                 console.log(insertQueryString);
-//                 successCallback();
-//             },
-//             function (err) {
-//                 console.log(err);
-//                 failureCallback();
-//             });
-//         connection.release();
-//     });
-// };
-
+//mongo
 db.submitProperty = function (property, successCallback, failureCallback) {
     console.log("Creating property inside database....")
+    console.log("availablefrom",property.availableFrom)
+    console.log("availablefrom",property.availableTo)
     var newProperty = new Property({
         address: property.address,
         headline: property.headline,

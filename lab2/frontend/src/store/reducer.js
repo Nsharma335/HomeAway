@@ -1,6 +1,9 @@
 const initalState = {
     user:[],
-	authFlag : false,
+    authFlag : false,
+    searchDetails: [],
+    searchResults :[],
+    searched:false
 }
 
 const reducer = (state = initalState,action) => {
@@ -15,20 +18,26 @@ const reducer = (state = initalState,action) => {
         }
     }
 
-
-
-    //Object.assign({},state, action.payload)
-    if(action.type==="SETAUTH")
-    {
-        return  Object.assign({},state, {flag: true})
-    }
-
-    if(action.type === "LOGIN" && action.status == 400){
+    if(action.type === "SEARCH_RESULTS" && action.statusCode == 200){
+        console.log("hello..")
+        console.log("SEARCH_RESULTS action.payload" ,action.payload)
         return {
             ...state,
-            authFlag : action.payload.authFlag
+            searchResults : state.searchResults.concat(action.payload),
+            searched :true
         }
     }
+
+    //Object.assign({},state, action.payload)
+    if(action.type==="PASS_SEARCH_DETAILS")
+    {
+        return {
+            ...state,
+            searchDetails : state.searchDetails.concat(action.payload),
+        }
+    }
+
+
     if(action.type === "CREATE_BOOK" && action.statusCode == 200){
         return {
             ...state,
