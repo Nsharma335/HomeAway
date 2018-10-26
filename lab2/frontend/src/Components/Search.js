@@ -4,6 +4,7 @@ import {Redirect} from 'react-router';
 import { connect } from 'react-redux';
 import axios from 'axios';
 import Swal from 'sweetalert2'
+import { stat } from 'fs';
 
 class Search extends Component {
     constructor(props) {
@@ -21,6 +22,15 @@ class Search extends Component {
         this.checkOutHandler = this.checkOutHandler.bind(this);
         this.guestHandler = this.guestHandler.bind(this);
     }
+    componentDidMount() {
+        // Remember state for the next mount
+     this.setState({location : localStorage.getItem("location")})
+     this.setState({checkin : localStorage.getItem("checkin")})
+     this.setState({checkout : localStorage.getItem("checkout")})
+     this.setState({guests : localStorage.getItem("guests")})
+    //console.log("here the location is ",this.state.location)
+      }
+    
 
     locationChangeHandler(e) {
         console.log("state location")
@@ -61,6 +71,9 @@ class Search extends Component {
             guests : this.state.guests
         }
         this.props.onSubmitHandle(data)
+        localStorage.setItem("checkin",this.state.checkin)
+        localStorage.setItem("checkout",this.state.checkout)
+
     }
 
 
@@ -96,10 +109,14 @@ class Search extends Component {
 
 const mapStateToProps = state =>{
     //console.log("State", state)
-    console.log("State serachdetails data...", state.searched)
+    console.log("State serachdetails data 1...", state.searched)
+    console.log("State serachdetails data 2...", state.location)
     return {
-        searchedProperty : state.searched
-
+        searchedProperty : state.searched,
+        location: state.location,
+        checkin:state.checkin,
+        checkout: state.checkout,
+        guests: state.checkout
     }
 }
     const mapDispatchStateToProps = dispatch => {
@@ -109,7 +126,8 @@ const mapStateToProps = state =>{
                     .then((response) => {
                             console.log("response fetched ROWS..", response.data.rows)
                             dispatch({type: 'SEARCH_RESULTS',payload :response.data.rows, statusCode : response.status})
-                          
+                            console.log("dataaa", data)
+                            dispatch({type: "SEARCH_PARAMETER", searchData : data})
                 })
             }
         }

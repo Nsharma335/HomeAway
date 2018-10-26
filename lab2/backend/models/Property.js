@@ -1,6 +1,7 @@
 var mongoose =require('mongoose');
 
 var Property= mongoose.model('Property',{
+
     address :{
         type : String
     },

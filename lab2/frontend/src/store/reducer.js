@@ -1,20 +1,21 @@
 const initalState = {
     user:[],
-    authFlag : false,
-    searchDetails: [],
+   authFlag : false,
     searchResults :[],
-    searched:false
+    searched:false,
+    location : "",
+    checkin: "",
+    checkout: "",
+    guests: "",
 }
 
 const reducer = (state = initalState,action) => {
-    console.log("in action type" , action.type)
-    console.log("in action status code" , action.statusCode)
     //console.log("in action.payload" , JSON.stringify(data).data)
     if(action.type === "USER_INFO" && action.statusCode == 200){
         return {
             ...state,
-            user : state.user.concat(action.payload),
-            authFlag: action.payload.authFlag
+            user : state.user.concat(action.payload.user),
+           authFlag: action.payload.authFlag
         }
     }
 
@@ -28,12 +29,17 @@ const reducer = (state = initalState,action) => {
         }
     }
 
-    //Object.assign({},state, action.payload)
-    if(action.type==="PASS_SEARCH_DETAILS")
-    {
+
+    if(action.type === "SEARCH_PARAMETER"){
+        console.log("hello..")
+        console.log("SEARCH_PARAMETER action.payload" ,action.searchData)
         return {
             ...state,
-            searchDetails : state.searchDetails.concat(action.payload),
+            location : action.searchData.location,
+            checkin : action.searchData.checkin,
+            checkout : action.searchData.checkout,
+            guests : action.searchData.location,
+        
         }
     }
 

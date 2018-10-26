@@ -14,7 +14,7 @@ class TravelerLogin extends Component {
         this.state = {
             email: this.props.signInEmail,
             password: this.props.signInPassword,
-            authFlag : this.props.authFlag
+           //authFlag : this.props.authFlag
         };
         this.passwordChangeHandler = this.passwordChangeHandler.bind(this);
         this.emailChangeHandler = this.emailChangeHandler.bind(this);
@@ -91,6 +91,7 @@ class TravelerLogin extends Component {
         {
             redirect = <Redirect to="/" />
         }
+
         return (
             <div>
                 {redirect}
@@ -141,7 +142,7 @@ class TravelerLogin extends Component {
 }
 
 const mapStateToProps = state =>{
-    //console.log("State", state)
+    console.log("State", state)
     console.log("State user", state.authFlag)
     return {
         authFlag : state.authFlag
@@ -154,18 +155,20 @@ const mapDispatchStateToProps = dispatch => {
         onSubmitHandle : (data) => {
             axios.post('http://localhost:3001/login', data,{ withCredentials: true })
                 .then((response) => {
-
-                    if (response.status === 401) {
+                    console.log("response got from Kafkaa... ",response)
+                    // console.log("response retrieval authflag from Kafkaa... ",response.data.updatedList.authFlag)
+                    // console.log("response retrieval authflag from Kafkaa... ",response.data.updatedList.user.email)
+                    if (response.data.updatedList.status === 403) {
                     console.log("Incorrect Credentials")
                     swal('Incorrect Password!', "Incorrect Credentials", 'error');
                          }
-                    if (response.status === 204) {
+                    if (response.data.updatedList.status === 401) {
                     console.log("User Not found")
                     swal('Email not registered!', "Please register to login.", 'error');
                         }
 
                         console.log("response fetched..", response.data.resData)
-                        dispatch({type: 'USER_INFO',payload :response.data.resData, statusCode : response.status})
+                        dispatch({type: 'USER_INFO',payload :response.data.updatedList, statusCode : response.status})
                       
             })
         }

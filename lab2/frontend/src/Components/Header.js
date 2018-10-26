@@ -61,8 +61,9 @@ class Header extends Component {
   renderHeader() {
     if (this.props.authFlag) {
       let details = this.props.userinfo.map(info => {
+        if(info!=null)
         return(
-            <span>{info.user.firstName}</span>
+            <span>{info.firstName}</span>
       )})
       // var details
       //  details = this.props.userinfo.map(book => {

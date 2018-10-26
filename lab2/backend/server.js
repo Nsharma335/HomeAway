@@ -16,6 +16,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 var cookieParser = require('cookie-parser');
+var kafka = require("./kafka/client")
 
 
 
@@ -178,78 +179,34 @@ app.post('/updateProfile', function (request, response) {
 });
 
 // Authenticate the user and get a JSON Web Token to include in the header of future requests.
-app.post('/login', function (request, response) {
-    var password;
-    db.findUser ({
-            email: request.body.email
-
-        }, function (row) {
-            var user = { email: row.email, firstName: row.firstName, lastName: row.lastName };
-            console.log("row email "+row.email + row.password)
-            crypt.compareHash(request.body.password, row.password, function (err, isMatch) {
-                console.log("inside compare hash");
-                if (isMatch && !err) {
-                    console.log("is matched true")
-                    var token = jwt.sign(user, config.secret, {
-                        expiresIn: 10080 // in seconds
-                    });
-                    let cookie = { user_email: request.body.email, first_name: row.firstName, last_name: row.lastName };
-                    response.cookie('cookieName', cookie, { maxAge: 90000000, httpOnly: false, path: '/' });
-                    console.log("user found..",row)
-                    const resData = {
-                        authFlag : true,
-                        user : row
-                    }
-                    response.status(200).json({ success: true, token: 'JWT ' + token , resData});
-                }
-            else
-                {  console.log("inside err" ,err)
-                   response.statusMessage = "Password did not match.";
-                   response.status(401).end();
-                }
-            },
-                function (err) {
-                    console.log(err);
-                    response.statusMessage = "Authentication failed 2. User not found.";
-                    response.status(204).end();
-
-                });
-        },
-        function (err) {
-            console.log("not found neha->",err);
-            response.statusMessage = "Authentication failed 3. User not Registered.";
-            response.status(204).end();
-
-        });
-});
-
-
-
 // app.post('/login', function (request, response) {
-//     var passwordd;
+//     var password;
 //     db.findUser ({
 //             email: request.body.email
 
-//         },async function (row) {
+//         }, function (row) {
 //             var user = { email: row.email, firstName: row.firstName, lastName: row.lastName };
-//             console.log("row email "+row.email)
-//             password=row.password;
-//         })
-//              crypt.compareHash(request.body.password, row.password, await function (err, isMatch) {
+//             console.log("row email "+row.email + row.password)
+//             crypt.compareHash(request.body.password, row.password, function (err, isMatch) {
 //                 console.log("inside compare hash");
 //                 if (isMatch && !err) {
+//                     console.log("is matched true")
 //                     var token = jwt.sign(user, config.secret, {
 //                         expiresIn: 10080 // in seconds
 //                     });
 //                     let cookie = { user_email: request.body.email, first_name: row.firstName, last_name: row.lastName };
 //                     response.cookie('cookieName', cookie, { maxAge: 90000000, httpOnly: false, path: '/' });
-//                     response.status(200).json({ success: true, token: 'JWT ' + token });
-
+//                     console.log("user found..",row)
+//                     const resData = {
+//                         authFlag : true,
+//                         user : row
+//                     }
+//                     response.status(200).json({ success: true, token: 'JWT ' + token , resData});
 //                 }
-//                 else {
-//                     console.log("err is " + err)
-//                     response.statusMessage = "Authentication failed 1. Passwords did not match.";
-//                     response.status(401).end();
+//             else
+//                 {  console.log("inside err" ,err)
+//                    response.statusMessage = "Password did not match.";
+//                    response.status(401).end();
 //                 }
 //             },
 //                 function (err) {
@@ -258,8 +215,98 @@ app.post('/login', function (request, response) {
 //                     response.status(204).end();
 
 //                 });
-        
-//             });
+//         },
+//         function (err) {
+//             console.log("not found neha->",err);
+//             response.statusMessage = "Authentication failed 3. User not Registered.";
+//             response.status(204).end();
+
+//         });
+// });
+
+
+//kafka working initial code...
+// app.post("/login", function(req, res) {
+//   console.log("Inside Login Post Request");
+//   console.log(req.body);
+//   kafka.make_request( "login",{ email: req.body.email, password: req.body.password },function(err, result) {
+//       console.log("in result");
+//       // console.log(res, err);
+//       if (err) {
+//         res.sendStatus(400).end();
+//       } else {
+//         if (result.code == 200) {
+//           const resData = {
+//              authFlag : true,
+//                 user : result
+//             }
+//           jwt.sign(payload,config.secret, { expiresIn: 8000 },
+//             (err, token) => {
+//               res.json({
+//                 success: true,
+//                 token: token,
+//                resData
+//               });
+//             }
+//           );
+//           res.status(200).json({ success: true, resData});
+//           console.log("success");
+//           // done(null, { results: results.value });
+//         } else {
+//           console.log("fail");
+//           //done(null, false, { message: results.value });
+//         }
+//       }
+//     }
+//   );
+// });
+
+
+app.post('/login', function(req, res){
+    kafka.make_request('login_topic',req.body, function(err,results){
+        console.log('in result');
+        console.log(results);
+        if (err){
+            console.log("Inside err");
+            res.json({
+                status:"error",
+                msg:"System Error, Try Again."
+            })
+        }else{
+            console.log("Inside else");
+                res.json({
+                    updatedList:results
+                });
+                res.end();
+            } 
+    });
+});
+
+// passport.use('local-login', new LocalStrategy({
+//     usernameField : 'email',
+//     passwordField : 'password',
+//     passReqToCallback : true
+//   },
+//   function(req, email, password, done) {
+//     var data = req.body;
+//     kafka.make_request('login_topic', data, function(err, rows){
+//       if(err) throw (err);
+//         if(rows.length >= 1){ 
+//           var isPasswordCorrect = bcrypt.compareSync(req.body.password, rows[0].password);
+//           if(isPasswordCorrect){
+//             var user = rows[0]
+//             console.log(user);
+//             return done(null, user);
+//           }
+//           else{return done(null, false);  }
+//         }
+//         else{ return done(null, false); }
+//     });
+//   }));
+  
+
+
+
 
 app.post('/searchProperty', function (request, response) {
 

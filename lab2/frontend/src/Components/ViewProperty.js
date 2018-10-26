@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import axios from 'axios';
 import Swal from 'sweetalert2';
-
+import { Link } from "react-router-dom";
 import HeaderBlue from './HeaderBlue';
 import Search from './Search';
 import { BrowserRouter as Router } from 'react-router-dom';
@@ -13,23 +13,24 @@ class ViewProperty extends Component {
         super();
         this.state = {
             data: [],
-            imagesPreview: []
+            imagesPreview: [],
 
         };
-        this.handleOnClickProperty = this.handleOnClickProperty.bind(this);
+       // this.handleOnClickProperty = this.handleOnClickProperty.bind(this);
     }
 
-    handleOnClickProperty(e) {
-        localStorage.setItem('property_id', e.target.dataset.id);
-        window.location.href = "http://localhost:3000/bookProperty"
-    }
-
+    // handleOnClickProperty(e) {
+    //     localStorage.setItem('property_id', e.target.dataset.id);
+    //     var id=e.target.dataset.id;
+    //     this.props.onSubmitHandle(id)
+    //    // <Redirect to="/bookProperty" />
+    //    // window.location.href = "http://localhost:3000/bookProperty"
+    // }
+  
+   
     render() {
         let propertytList;
-
-
         propertytList = this.props.searchResults.map(property => {
-
             return (
                 <div>
                     <div className="container-fluid" style={{
@@ -47,7 +48,14 @@ class ViewProperty extends Component {
                             </div>
                             <div className="col-sm-10 nameview">
                                 <div>
-                                    <a href="#" onClick={this.handleOnClickProperty} data-id={property.propertyId}> Property {property.propertyId} </a>
+                                    {/* <Link to={} data-id={property._id}> Property {property._id} </Link> */}
+                                    <Link  to={{
+                                        pathname: "/bookProperty",
+                                         state: {
+                                             property: property
+                                             }
+                                             }} 
+                                             role="button">{property.headline}</Link>
                                 </div>
                                 <div className="displayRow">
                                     <div id="below">{property.headline}</div>
@@ -86,11 +94,20 @@ class ViewProperty extends Component {
 
 const mapStateToProps = state =>{
     //console.log("State", state)
-  
     console.log("State in view property searchresults..", state.searchResults)
     return {
-        searchResults : state.searchResults
+        searchResults : state.searchResults,
+     
     }
 }
 
-export default connect(mapStateToProps)(ViewProperty);
+// const mapDispatchStateToProps = dispatch => {
+//     return {
+//         onSubmitHandle : (data) => {
+                        
+//             dispatch({type: 'USER_INFO',payload :data})
+//         }
+//     }
+// }
+
+export default connect(mapStateToProps,null)(ViewProperty);

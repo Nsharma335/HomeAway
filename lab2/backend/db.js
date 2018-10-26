@@ -49,9 +49,6 @@ db.createUser = function (user, successCallback, failureCallback) {
 
 db.findUser = function (userInfo, successCallback, failureCallback) {
     console.log("Finding user in database..")
-    // pool.getConnection(function (err, connection) {
-    //     var sqlQuery = "SELECT * FROM `Homeaway`.`UserTable` WHERE `email` = '" + user.email + "';";
-    //     console.log("query ", sqlQuery);
     console.log("user info email"+userInfo.email) 
         User.findOne({
             email: userInfo.email       
@@ -124,6 +121,55 @@ db.searchProperty = function (property, successCallback, failureCallback) {
     })
 };
 
+//update
+
+// Userprofile.findOneAndUpdate(
+//     { username: req.body.username },
+//     {
+//       $set: {
+//         firstname: req.body.firstname,
+//         lastname: req.body.lastname,
+//         about: req.body.aboutme,
+//         company: req.body.company,
+//         school: req.body.school,
+//         hometown: req.body.hometown,
+//         languages: req.body.languages,
+//         gender: req.body.gender,
+//         city: req.body.city,
+//         phone: req.body.phone
+//       }
+//     },
+//     { new: true },
+//     (err, result) => {
+//       if (err) {
+//         console.log("Something wrong when updating data!");
+//         res.sendStatus(400).end();
+//       } else {
+//         console.log("Updated profile details are:", result);
+//         res.sendStatus(200).end();
+//       }
+//     }
+//   );
+  
+  //updat ends
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 db.updateProfile = function (form_values, successCallback, failureCallback) {
     console.log("Updating profile of user : " + form_values.firstName)
     pool.getConnection(function (err, connection) {
@@ -185,30 +231,34 @@ db.submitProperty = function (property, successCallback, failureCallback) {
       }
 };
 
+//will be working back on this after kafka....
+// db.findProperty = function (property, successCallback, failureCallback) {
+//     console.log("fetching properties from Database..")
+//     Property.find({
+//         _id: property._id
+//         }
 
-db.findProperty = function (property, successCallback, failureCallback) {
-    console.log("fetching properties from Database..")
-    pool.getConnection(function (err, connection) {
-        var sqlQuery = "SELECT * FROM `Homeaway`.`property` WHERE `propertyId` = '" + property.id + "';";
-        console.log("query result " + sqlQuery);
-        connection.query(sqlQuery, function (err, rows) {
-            if (err) {
-                console.log("failure callback 1")
-                failureCallback(err);
-                return;
-            }
-            if (rows.length > 0) {
-                successCallback(rows[0])
-            }
-            else {
-                console.log("failure callback 2")
-                failureCallback('Property not found.');
-            }
-            connection.release();
-        });
+//     pool.getConnection(function (err, connection) {
+//         var sqlQuery = "SELECT * FROM `Homeaway`.`property` WHERE `propertyId` = '" + property._id + "';";
+//         console.log("query result " + sqlQuery);
+//         connection.query(sqlQuery, function (err, rows) {
+//             if (err) {
+//                 console.log("failure callback 1")
+//                 failureCallback(err);
+//                 return;
+//             }
+//             if (rows.length > 0) {
+//                 successCallback(rows[0])
+//             }
+//             else {
+//                 console.log("failure callback 2")
+//                 failureCallback('Property not found.');
+//             }
+//             connection.release();
+//         });
 
-    });
-};
+//     });
+// };
 
 
 db.findOwnersListedPropertyperty = function (property, successCallback, failureCallback) {
