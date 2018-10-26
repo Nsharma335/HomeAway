@@ -34,42 +34,6 @@ class TravelerLogin extends Component {
             document.getElementById("password-error").innerHTML = "";
     }
 
-    // submitLogin = e => {
-    //     //prevent page from refresh
-    //     e.preventDefault();
-    //     console.log("inside submit login from client side..")
-    //     const data = {
-    //         email: this.state.email,
-    //         password: this.state.password
-    //     };
-    //     console.log("user " + data.email + " pwd " + data.password)
-    //     console.log("with credentials true")
-
-    //     axios.post('http://localhost:3001/login', data, { withCredentials: true })
-    //         .then(response => {
-    //             console.log("hello neha")
-    //             console.log("Status Code : ", response.status);
-    //             if (response.data.success) {
-    //                 console.log("success")
-    //                 this.setState({
-    //                     authFlag: true,
-    //                 });
-    //                 window.location.href = "http://localhost:3000/";
-    //             }
-    //             if (response.status === 401) {
-    //                 console.log("Incorrect Credentials")
-    //                 swal('Incorrect Password!', "Incorrect Credentials", 'error');
-    //             }
-    //             if (response.status === 204) {
-    //                 console.log("User Not found")
-    //                 swal('Email not registered!', "Please register to login.", 'error');
-    //             }
-
-    //         });
-    // }
-
-///try to loginz!!
-    
 
     submitLogin = (e) => {
         //prevent page from refresh

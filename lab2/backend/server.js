@@ -103,30 +103,89 @@ app.post('/download/:file(*)', (req, res) => {
 });
 
 
+// app.post('/register', function (request, response) {
+//     console.log("Registering New User...")
+//     console.log(request.body);
+//     if (!request.body.firstName || !request.body.lastName || !request.body.email || !request.body.password) {
+//         response.status(400).json({ success: false, message: 'Please enter all the fields.' });
+//     } else {
+//         response.cookie('cookieName', "cookieValue", { maxAge: 90000000, httpOnly: false, path: '/' });
+//         var newUser = {
+//             firstName: request.body.firstName,
+//             lastName: request.body.lastName,
+//             email: request.body.email,
+//             password: request.body.password
+//         };
+
+//         // Attempt to save the user
+//         db.createUser(newUser, function (res) {
+//             response.statusMessage = "Successfully created new user.";
+//             response.status(200).end();
+//         }, function (err) {
+//             console.log(err);
+//             response.statusMessage = "Username already exist";
+//             response.status(204).end();
+//         });
+//     }
+// });
+
+// sendResponseToClient(err, results, response)
+// {
+//     if (err){
+//         console.log("Inside err");
+//         response.json({
+//             status:"error",
+//             msg:"System Error, Try Again."
+//         })
+//     }else{
+//         console.log("Inside else");
+//         response.json({
+//                 updatedList:results
+//             });
+//             response.end();
+//         } 
+// }
+
 app.post('/register', function (request, response) {
     console.log("Registering New User...")
     console.log(request.body);
-    if (!request.body.firstName || !request.body.lastName || !request.body.email || !request.body.password) {
-        response.status(400).json({ success: false, message: 'Please enter all the fields.' });
-    } else {
-        response.cookie('cookieName', "cookieValue", { maxAge: 90000000, httpOnly: false, path: '/' });
-        var newUser = {
-            firstName: request.body.firstName,
-            lastName: request.body.lastName,
-            email: request.body.email,
-            password: request.body.password
-        };
+    kafka.make_request("register_topic", request.body, function(err, results) {
+        console.log(results);
+        if (err){
+            console.log("Inside err");
+            response.json({
+                status:"error",
+                msg:"System Error, Try Again."
+            })
+        }else{
+            console.log("Inside else");
+            response.json({
+                    updatedList:results
+                });
+                response.end();
+            } 
+    });
+});
 
-        // Attempt to save the user
-        db.createUser(newUser, function (res) {
-            response.statusMessage = "Successfully created new user.";
-            response.status(200).end();
-        }, function (err) {
-            console.log(err);
-            response.statusMessage = "Username already exist";
-            response.status(204).end();
-        });
-    }
+
+app.post('/login', function(request, response){
+    kafka.make_request('login_topic',request.body, function(err,results){
+        console.log('in result');
+        console.log(results);
+        if (err){
+            console.log("Inside err");
+            response.json({
+                status:"error",
+                msg:"System Error, Try Again."
+            })
+        }else{
+            console.log("Inside else");
+            response.json({
+                    updatedList:results
+                });
+                response.end();
+            } 
+    });
 });
 
 
@@ -262,25 +321,6 @@ app.post('/updateProfile', function (request, response) {
 // });
 
 
-app.post('/login', function(req, res){
-    kafka.make_request('login_topic',req.body, function(err,results){
-        console.log('in result');
-        console.log(results);
-        if (err){
-            console.log("Inside err");
-            res.json({
-                status:"error",
-                msg:"System Error, Try Again."
-            })
-        }else{
-            console.log("Inside else");
-                res.json({
-                    updatedList:results
-                });
-                res.end();
-            } 
-    });
-});
 
 // passport.use('local-login', new LocalStrategy({
 //     usernameField : 'email',

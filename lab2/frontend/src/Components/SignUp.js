@@ -3,8 +3,9 @@ import '../App.css';
 import axios from 'axios';
 import HeaderBlue from './HeaderBlue';
 import Swal from 'sweetalert2'
+import { connect } from 'react-redux';
 
-export default class SignUp extends Component {
+class SignUp extends Component {
 
     constructor(props) {
         super(props);
@@ -62,17 +63,7 @@ export default class SignUp extends Component {
     handleRegistration(e) {
         e.preventDefault();
         const data = { firstName: this.state.firstName, lastName: this.state.lastName, email: this.state.email, password: this.state.password };
-
-        axios.post('http://localhost:3001/register', data)
-            .then((response) => {
-                if (response.status === 200) {
-                    Swal('Registered succesfully!', "You have been successfully registered.", 'success');
-                }
-                if (response.status === 204) {
-                    console.log(response)
-                    Swal('Email already exist!', "You have been already registered", 'error');
-                }
-            });
+        this.props.onSubmitHandle(data);
     }
 
     validateFirstNameFormat(firstName) {
@@ -134,3 +125,38 @@ export default class SignUp extends Component {
         )
     }
 }
+
+
+
+
+const mapStateToProps = state =>{
+    console.log("State", state)
+    console.log("State user", state.registered)
+    return {
+        registered : state.registered
+
+    }
+}
+
+const mapDispatchStateToProps = dispatch => {
+    return {
+        onSubmitHandle : (data) => {
+            axios.post('http://localhost:3001/register', data,{ withCredentials: true })
+            .then((response) => {
+
+                console.log("response on client ", response)
+                if (response.data.updatedList.status === 200) {
+                    Swal('Registered succesfully!', "You have been successfully registered.", 'success');
+                }
+                if (response.data.updatedList.status === 204) {
+                    console.log(response)
+                    Swal('Email already exist!', "You have been already registered", 'error');
+                }
+             dispatch({type: 'REGISTER_USER',payload :response.data.updatedList, statusCode :response.data.updatedList.status})
+                 
+            })
+        }
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchStateToProps)(SignUp);

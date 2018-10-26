@@ -30,7 +30,7 @@ db.createUser = function (user, successCallback, failureCallback) {
             else{
         
             newUser.save().then((user)=> {
-                console.log("User created : ", user);
+                console.log("User created in database: ", user);
                 successCallback()
                 //res.sendStatus(200).end();
             }, (err) => {

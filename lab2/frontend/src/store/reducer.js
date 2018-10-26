@@ -7,6 +7,7 @@ const initalState = {
     checkin: "",
     checkout: "",
     guests: "",
+    registered: false,
 }
 
 const reducer = (state = initalState,action) => {
@@ -44,13 +45,16 @@ const reducer = (state = initalState,action) => {
     }
 
 
-    if(action.type === "CREATE_BOOK" && action.statusCode == 200){
+    if(action.type === "REGISTER_USER" && action.statusCode == 200){
         return {
             ...state,
-            books : state.books.concat(action.payload.data),
-            bookCreated:true
+            registered:true
         }
     }
+
+
+
+
     if(action.type === "CREATE_BOOK" && action.statusCode == 400){
         return {
             ...state,

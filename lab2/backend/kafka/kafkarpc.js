@@ -41,7 +41,7 @@ KafkaRPC.prototype.makeRequest = function(topic_name, content, callback){
 
     //make sure we have a response topic
     self.setupResponseQueue(self.producer,topic_name,function(){
-        console.log('in response');
+        console.log('Yes, we have a response queue i.e. topic');
         //put the request on a topic
 
         var payloads = [

@@ -1,6 +1,7 @@
 var db = require('../../backend/db');
 var crypt = require('../../backend/crypt');
 var jwt = require('jsonwebtoken');
+var config = require('../../backend/settings');
 //Authenticate the user and get a JSON Web Token to include in the header of future requests.
 // send this service request to kafka , we used to send our service to databse directly before, now we are sending it to kafka.
 function handle_request(msg, callback){
@@ -14,16 +15,16 @@ function handle_request(msg, callback){
                 console.log("inside compare hash");
                 if (isMatch && !err) {
                     console.log("is matched true")
-                   // var token = jwt.sign(user, config.secret, {
-                       // expiresIn: 10080 // in seconds
-                   // });
+                   var token = jwt.sign(user, config.secret, {
+                     expiresIn: 10080 // in seconds
+                   });
                     //let cookie = { user_email: request.body.email, first_name: row.firstName, last_name: row.lastName };
                    // response.cookie('cookieName', cookie, { maxAge: 90000000, httpOnly: false, path: '/' });
                     console.log("user found..",row)
                     const resData = {
                         authFlag : true,
                         user : row,
-                       // token: "JWT"+token,
+                       token: "JWT"+token,
                         status: 200
                     }
                     callback(err,resData)

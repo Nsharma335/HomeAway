@@ -1,74 +1,46 @@
-var mongoose = require("./mongoose");
-//var passwordHash = require('password-hash');
-const bcrypt = require("bcrypt");
 
-function handle_request(msg, callback) {
-  var res = {};
-  console.log("In handle login request:" ,msg);
-  console.log("In handle login request:" , msg.password);
+var db = require('../../backend/db');
 
-  mongoose.User.findOne({ email: msg.email },
-    function(err, user, info) {
-    console.log("password" + user.password);
-    if (err) {
-      console.log(err);
+function handle_request(msg, callback){
+    console.log("Registering New User...")
+    console.log(msg);
+    console.log("msg received for register",msg)
+    if (!msg.firstName || !msg.lastName || !msg.email || !msg.password) {
+        const resData = {
+            message: 'Please enter all the fields.',
+            success: false,
+            status : 400
+        }
+        callback(err,resData)
+       
     } else {
-      if (!user) {
-        console.log("not valid user");
-        res.code = "404";
-        res.value = "user does not exist";
-        //done(null,false,{ message: 'user does not exist' });
-      } else {
-        // var check = passwordHash.verify(msg.password, user.pwd);
-        // console.log('check'+check);
-        // if (check === true) {
-        //     res.code = "200";
-        //     res.value = user;
-        //     // done(null,{username: username, password: password});
-        // }
-        // else{
-        //     res.code = "401";
-        //     res.value = "password incorrect";
-        //      //done(null,false,{message: "password incorrect"});
-        // }
-        bcrypt.compare(msg.password, user.password, function(err, result) {
-          console.log("inside ", err, result);
-          if (err) {
-            res.code = "401";
-            res.value =
-              "The email and password you entered did not match our records. Please double-check and try again.";
-            console.log(res.value);
-            res.sendStatus(401).end();
-          } else if (result) {
-            console.log("test1");
-            const payload = {
-              email: user.email
-            };
-            console.log("payload neha", payload);
-            // jwt.sign(
-            //   payload,
-            //   config.secret,
-            //   { expiresIn: 8000 },
-            //   (err, token) => {
-            //     res.json({
-            //       success: true,
-            //       token: token,
-            //       email: user.email,
-            //       name: user.name,
-            //       type: user.type
-            //     });
-            //   }
-            // );
-            res.code = "200";
-            res.value = user;
-            console.log("response", res);
-            callback(null, res);
-          }
+        //response.cookie('cookieName', "cookieValue", { maxAge: 90000000, httpOnly: false, path: '/' });
+        var newUser = {
+            firstName: msg.firstName,
+            lastName: msg.lastName,
+            email: msg.email,
+            password: msg.password
+        };
+
+        // Attempt to save the user
+        db.createUser(newUser, function (res) {
+            const resData = {
+                message : "Successfully created new user.",
+                status: 200,
+                user : res
+            }
+            callback(null,resData)
+        }, function (err) {
+            console.log(err);
+            const resData = {
+                message : "Username already exist.",
+                status: 204
+            }
+            callback(err,resData)
         });
-      }
     }
-    //callback(null, res);
-  });
+
 }
+
 
 exports.handle_request = handle_request;
