@@ -6,11 +6,11 @@ import Confirmation from './Confirmation';
 import axios from 'axios';
 import cookie from 'react-cookies';
 import SideNavBarProperty from './SideNavBarProperty';
-
+import { connect } from 'react-redux';
 import HeaderOwner from './HeaderOwner';
 import swal from 'sweetalert2'
 
-export default class ListYourProperty extends Component {
+class ListYourProperty extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -28,11 +28,13 @@ export default class ListYourProperty extends Component {
                 bookingType: "",
                 currency: "",
                 baseRate: "",
+                
 
             },
             selectedFiles: [],
             images: [],
-            step: 1
+            step: 1,
+            //owner : ""
         };
         this.nextStep = this.nextStep.bind(this);
         this.renderForm = this.renderForm.bind(this);
@@ -42,8 +44,7 @@ export default class ListYourProperty extends Component {
 
     }
     renderForm() {
-        if (cookie.load('cookieName')) {
-
+        if (true) {
             console.log("next step is " + this.state.step);
             switch (this.state.step) {
                 case 1:
@@ -129,19 +130,16 @@ export default class ListYourProperty extends Component {
 
     submitProperty(e) {
         e.preventDefault();
+        
         var self = this;
-        console.log("loading property cookie")
-        var cookievalue = cookie.load("cookieName");
-        console.log(cookievalue);
-        var jsonobject = cookievalue.substring(2);
-        console.log(jsonobject);
-        var parsedObject = JSON.parse(jsonobject);
-        var id = parsedObject.user_email;
-        console.log("state owner" + this.state.owner)
-        var owner = id;
-
-        //fetching file names from state
-
+        var id=null;
+        let details= this.props.userinfo.map(user=> {
+            if(user!=null){
+            console.log("inside map email",user.email)
+            id = user.email
+            }
+        })
+        
         const data = {
             address: this.state.fieldValues.address,
             headline: this.state.fieldValues.headline,
@@ -156,26 +154,38 @@ export default class ListYourProperty extends Component {
             currency: this.state.fieldValues.currency,
             baseRate: this.state.fieldValues.baseRate,
             owner: id,
-
         }
-        console.log("id" + id)
-        console.log("owner" + owner);
-        axios.post('http://localhost:3001/submitProperty', data)
-            .then((response) => {
-                // window.location.href = "http://localhost:3000/dashboard";
-                if (response.status === 201) {
-                    setTimeout(function () {
-                        swal({ title: 'Property Listed!', text: "Your Property listed successfully.", type: 'success' },
-                            function () {
-                                window.location.href = "http://localhost:3000/ownerDashboard";
-                            });
-                    }, 1000);
-                } else {
-                    this.setState({
-                        isLoggeedIn: false
-                    })
-                }
-            });
+        this.props.onSubmitHandle(data)
     }
 }
 
+
+const mapStateToProps = state =>{
+    console.log("State", state)
+    console.log("State user", state.authFlag)
+    return {
+        authFlag : state.authFlag,
+        userinfo :state.user
+    }
+}
+
+const mapDispatchStateToProps = dispatch => {
+    return {
+        onSubmitHandle : (data) => {
+console.log("inside on submit handler...")
+            axios.post('http://localhost:3001/submitProperty', data)
+                .then((response) => {
+                    console.log("response got from Kafkaa list property... ",response)
+                    if (response.data.updatedList.status === 201) {
+                    console.log("Incorrect Credentials")
+                    swal('Your Property listed successfully.', "Property Listed!", 'success');
+                         }
+                        console.log("response fetched..", response.data.resData)
+                        dispatch({type: 'ADD_PROPERTY',payload :response.data.updatedList, statusCode : response.status})
+                      
+            })
+        }
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchStateToProps)(ListYourProperty);

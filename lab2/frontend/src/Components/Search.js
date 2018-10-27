@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 import Swal from 'sweetalert2'
 import { stat } from 'fs';
+import swal from 'sweetalert2'
 
 class Search extends Component {
     constructor(props) {
@@ -124,8 +125,12 @@ const mapStateToProps = state =>{
             onSubmitHandle : (data) => {
                 axios.post('http://localhost:3001/searchProperty', data,{ withCredentials: true })
                     .then((response) => {
-                            console.log("response fetched ROWS..", response.data.rows)
-                            dispatch({type: 'SEARCH_RESULTS',payload :response.data.rows, statusCode : response.status})
+                            console.log("response fetched ROWS..", response.data.updatedList)
+                            if(response.data.updatedList.status==204)
+                            {
+                                swal('There is no property with this criteria.', "No results", 'error');
+                            }
+                            dispatch({type: 'SEARCH_RESULTS',payload :response.data.updatedList.rows, statusCode : response.data.updatedList.status})
                             console.log("dataaa", data)
                             dispatch({type: "SEARCH_PARAMETER", searchData : data})
                 })

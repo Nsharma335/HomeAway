@@ -24,38 +24,8 @@ class Header extends Component {
     window.location.href = "http://localhost:3000/";
   }
 
-  componentWillMount() {
-    console.log("my auth",this.props.authFlag)
-    // if (this.props.authFlag)
-    // this.loadUserDetails();
-  }
-
-  // loadUserDetails() {
-  //   var self = this;
-
-  //   var cookievalue = cookie.load("cookieName");
-  //   var jsonobject = cookievalue.substring(2);
-  //   var parsedObject = JSON.parse(jsonobject);
-  //   var id = parsedObject.user_email;
-  //   if (id != null) {
-  //     console.log("id is" + id);
-  //     const data = { email: id };
-  //     console.log("my data" + data);
-  //     axios.get("http://localhost:3001/getUserDetails?email=" + id)
-  //       .then(function (response) {
-  //         if (response.data.rows != null) {
-  //           console.log("if row returned from get user , come here")
-  //           let user_detail = response.data.rows;
-  //           console.log("response data email->" + response.data.rows.email);
-  //           console.log("email from user_detail->" + user_detail.email);
-  //           self.setState({
-  //             firstName: user_detail.firstName,
-  //           })
-  //           return;
-  //         }
-  //         return;
-  //       })
-  //   }
+  // componentWillMount() {
+  //   console.log("my auth",this.props.authFlag)
   // }
 
   renderHeader() {
@@ -65,8 +35,7 @@ class Header extends Component {
         return(
             <span>{info.firstName}</span>
       )})
-      // var details
-      //  details = this.props.userinfo.map(book => {
+  
       return (
         <li class="dropdown" >
           <a class="dropdown-toggle" data-toggle="dropdown" href="#" style={{ color: "white" }}>
@@ -90,9 +59,9 @@ class Header extends Component {
                         </li>
                         <li>
                             <button class="btn navbar-btm">
-                                <a href="/travelerTrips" >
-                                    <span>My Trips</span>
-                                </a>
+                                <Link  to="/travelerTrips">
+                                <span>My Trips</span>
+                            </Link>
                             </button>
                         </li>
             <li>
@@ -166,7 +135,6 @@ class Header extends Component {
 }
 
 const mapStateToProps = state =>{
-  //console.log("State", state)
   console.log("State header user", state.user)
   return {
       authFlag : state.authFlag,

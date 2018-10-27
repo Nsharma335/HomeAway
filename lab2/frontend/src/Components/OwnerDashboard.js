@@ -4,9 +4,10 @@ import Swal from 'sweetalert2';
 import cookie from 'react-cookies';
 import HeaderOwner from './HeaderOwner';
 import Moment from 'react-moment';
+import { connect } from 'react-redux';
+import {Redirect} from 'react-router'; 
 
-
-export default class OwnerDashboard extends Component {
+class OwnerDashboard extends Component {
     constructor() {
         super();
         this.state = {
@@ -15,44 +16,48 @@ export default class OwnerDashboard extends Component {
         };
     }
     componentWillMount() {
-
+      
     }
 
     componentDidMount() {
-        if (cookie.load("cookieName"))
+        if (this.props.authFlag)
             this.loadOwnerPropertyDetails();
         else
-            window.location.href = "http://localhost:3000/ownerlogin";
+        <Redirect to="/ownerlogin" />
+        
     }
 
     loadOwnerPropertyDetails() {
         var self = this;
-        console.log("loading property cookie")
-        var cookievalue = cookie.load("cookieName");
-        console.log(cookievalue);
-        var jsonobject = cookievalue.substring(2);
-        console.log(jsonobject);
-        var parsedObject = JSON.parse(jsonobject);
-        var id = parsedObject.user_email;
+        var id=null;
+        let details= this.props.userinfo.map(user=> {
+            if(user!=null){
+            console.log("inside map email",user.email)
+            id = user.email
+            }
+        })
+        console.log("user email id fetched from store..",id)
         console.log("OWNER DASHBOARD PAGE ID" + id)
         if (id != null) {
             axios.get("http://localhost:3001/ownersListedProperty?email=" + id)
                 .then(function (response) {
-                    if (response.data.rows != null) {
-                        console.log(response);
+                    console.log("response",response)
+                    if (response.data.updatedList.rows != null) {
+                        console.log("response from backedn",response.data.updatedList.rows);
                         self.setState({
-                            data: response.data.rows
+                            data: response.data.updatedList.rows
                         })
                     }
-                    if (response.status === 204) {
+                    if (response.data.updatedList.status === 204) {
                         console.log("hey data is not present");
-                        console.log("data" + response.data.status)
+                        console.log("data" + response.data.updatedList.status)
                         return
                     }
                 })
         }
     }
     render() {
+        console.log("this.state.data---> ",this.state.data.length)
         let propertytList;
         propertytList = this.state.data.map(property => {
 
@@ -67,7 +72,7 @@ export default class OwnerDashboard extends Component {
                     }}>
                         <div className="row">
                             <div className="col-sm-2" >
-                                <img src={require(`../Components/uploads/${property.images}`)} height="100px" />
+                                {/* <img src={require(`../Components/uploads/${property.images}`)} height="100px" /> */}
                             </div>
                             <div className="col-sm-10 nameview">
                                 <div>
@@ -98,9 +103,8 @@ export default class OwnerDashboard extends Component {
         });
 
 
-        if (this.state.data != null) {
+        if (this.state.data.length>0) {
             return (
-
                 <div>
                     <div className="main-property-div" style={{ backgroundColor: '#f7f7f8' }}>
                         <HeaderOwner />
@@ -108,23 +112,31 @@ export default class OwnerDashboard extends Component {
                     </div>
                 </div >
             )
-
-
         }
-
-        else {
-            console.log("inside undefined block")
+        else{
             return (
                 <div>
-                    <HeaderOwner />
+                     <HeaderOwner />
                     <div className="col-md-10 form-group" style={{ textAlign: "center", margin: "100px" }}>
                         <h2> You Haven't listed anything, Start listing your property.
                                 <br></br>
                             <a href="/listYourProperty">Here</a></h2>
-
                     </div>
-                </div>
+                </div >
             )
         }
     }
 }
+
+
+const mapStateToProps = state =>{
+    console.log("State auth", state)
+    console.log("State user", state.userinfo)
+    return {
+        authFlag : state.authFlag,
+        userinfo : state.user
+
+    }
+}
+
+export default connect(mapStateToProps)(OwnerDashboard);

@@ -8,6 +8,8 @@ const initalState = {
     checkout: "",
     guests: "",
     registered: false,
+    userProfileUpdated: false,
+    propertyCreated: false
 }
 
 const reducer = (state = initalState,action) => {
@@ -52,15 +54,20 @@ const reducer = (state = initalState,action) => {
         }
     }
 
-
-
-
-    if(action.type === "CREATE_BOOK" && action.statusCode == 400){
+    if(action.type === "UPDATE_PROFILE" && action.statusCode == 200){
         return {
             ...state,
-            bookCreated:false
+            userProfileUpdated:true
         }
     }
+
+    if(action.type === "ADD_PROPERTY" && action.statusCode == 201){
+        return {
+            ...state,
+            propertyCreated:true
+        }
+    }
+    
     if(action.type === "DELETE_BOOK" && action.statusCode == 200){
         console.log("Data recieved : ", action.payload.data.books);
         var b = new Array(action.payload.data.books.length);

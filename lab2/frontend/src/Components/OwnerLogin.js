@@ -3,6 +3,8 @@ import '../App.css';
 import axios from 'axios';
 import swal from 'sweetalert2'
 import cookie from 'react-cookies';
+import {Redirect} from 'react-router'; 
+import { connect } from 'react-redux';
 
 class OwnerLogin extends Component {
 
@@ -62,37 +64,44 @@ class OwnerLogin extends Component {
         console.log("user " + data.email + " pwd " + data.password)
         console.log("with credentials true")
 
-        axios.post('http://localhost:3001/login', data, { withCredentials: true })
-            .then(response => {
+        // axios.post('http://localhost:3001/login', data, { withCredentials: true })
+        //     .then(response => {
 
-                console.log("Status Code : ", response.status);
-                if (response.data.success) {
-                    console.log("success")
-                    this.setState({
-                        authFlag: true,
+        //         console.log("Status Code : ", response.status);
+        //         if (response.data.success) {
+        //             console.log("success")
+        //             this.setState({
+        //                 authFlag: true,
 
-                    });
-                    window.location.href = "http://localhost:3000/ownerDashboard";
+        //             });
+        //             window.location.href = "http://localhost:3000/ownerDashboard";
 
-                } else {
-                    console.log("error")
-                    this.setState({
-                        authFlag: false
-                    })
-                    swal({
-                        type: 'error',
-                        title: 'Wrong Credentials.',
-                        text: 'You entered invalid credentials or your email not registered!'
-                    })
-                }
-            });
+        //         } else {
+        //             console.log("error")
+        //             this.setState({
+        //                 authFlag: false
+        //             })
+        //             swal({
+        //                 type: 'error',
+        //                 title: 'Wrong Credentials.',
+        //                 text: 'You entered invalid credentials or your email not registered!'
+        //             })
+        //         }
+        //     });
+
+        this.props.onSubmitHandle(data);
     }
 
 
     render() {
-
+        let redirect=null;
+        if(this.props.authFlag)
+        {
+            redirect = <Redirect to="/ownerDashboard" />
+        }
         return (
             <div>
+                    {redirect}
                 <nav class="navbar navbar-light">
                     <div class="container-fluid">
                         <div class="navbar-header">
@@ -141,4 +150,39 @@ class OwnerLogin extends Component {
         )
     }
 }
-export default OwnerLogin;
+
+const mapStateToProps = state =>{
+    console.log("State", state)
+    console.log("State user", state.authFlag)
+    return {
+        authFlag : state.authFlag,
+        user : state.user
+    }
+}
+
+const mapDispatchStateToProps = dispatch => {
+    return {
+        onSubmitHandle : (data) => {
+            axios.post('http://localhost:3001/login', data,{ withCredentials: true })
+                .then((response) => {
+                    console.log("response got from Kafkaa in ownerLogin... ",response)
+                    // console.log("response retrieval authflag from Kafkaa... ",response.data.updatedList.authFlag)
+                    // console.log("response retrieval authflag from Kafkaa... ",response.data.updatedList.user.email)
+                    if (response.data.updatedList.status === 403) {
+                        console.log("Incorrect Credentials")
+                        swal('Incorrect Password!', "Incorrect Credentials", 'error');
+                             }
+                        if (response.data.updatedList.status === 401) {
+                        console.log("User Not found")
+                        swal('Email not registered!', "Please register to login.", 'error');
+                            }
+
+                        console.log("response fetched..", response.data.resData)
+                        dispatch({type: 'USER_INFO',payload :response.data.updatedList, statusCode : response.status})
+                      
+            })
+        }
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchStateToProps)(OwnerLogin);

@@ -5,6 +5,11 @@ var connection = new require("./kafka/Connection");
 //var Books = require('./services/books.js');
 var login = require("./services/login");
 var register = require("./services/register");
+var updateProfile = require("./services/updateProfile");
+var searchProperty = require("./services/searchProperty");
+var addProperty = require("./services/addProperty");
+var propertyListedByOwner = require("./services/propertyListedByOwner");
+var getUserDetails = require("./services/getUserDetails");
 
 function handleTopicRequest(topic_name, fname) {
   //var topic_name = 'root_topic';
@@ -40,3 +45,8 @@ function handleTopicRequest(topic_name, fname) {
 //second argument is a function that will handle this topic request
 handleTopicRequest("login_topic", login);
 handleTopicRequest("register_topic", register);
+handleTopicRequest("update_profile_topic", updateProfile);
+handleTopicRequest("search_property_topic", searchProperty);
+handleTopicRequest("add_property_topic", addProperty);
+handleTopicRequest("owner_listing_property_topic", propertyListedByOwner);
+handleTopicRequest("get_user_details_topic", getUserDetails);

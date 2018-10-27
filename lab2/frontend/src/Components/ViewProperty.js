@@ -7,6 +7,7 @@ import Search from './Search';
 import { BrowserRouter as Router } from 'react-router-dom';
 import {Redirect} from 'react-router'; 
 import { connect } from 'react-redux';
+import swal from 'sweetalert2'
 
 class ViewProperty extends Component {
     constructor() {
@@ -31,6 +32,7 @@ class ViewProperty extends Component {
     render() {
         let propertytList;
         propertytList = this.props.searchResults.map(property => {
+            console.log("property",property)
             return (
                 <div>
                     <div className="container-fluid" style={{

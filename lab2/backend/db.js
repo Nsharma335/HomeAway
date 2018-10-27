@@ -68,136 +68,67 @@ db.findUser = function (userInfo, successCallback, failureCallback) {
         })
 };
 
-// db.searchProperty = function (property, successCallback, failureCallback) {
-//     console.log(property)
-//     var data = {};
-//     pool.getConnection(function (err, connection) {
-//         console.log("Searching property in database");
-//         console.log(property)
-
-//         var sqlQuery = "SELECT * FROM `Homeaway`.`property` WHERE address = '" + property.data.location + "' and availableFrom <= '" + property.data.checkin + "' and availableTo >='" + property.data.checkout + "' ;";
-//         console.log(sqlQuery);
-//         connection.query(sqlQuery, function (err, rows) {
-//             if (err) {
-//                 console.log("failure callback 1")
-//                 failureCallback(err);
-//                 return;
-//             }
-//             if (rows.length > 0) {
-//                 console.log("successCallback callback 2")
-//                 console.log("rows generated are" + rows)
-//                 successCallback(rows)
-//             }
-//             else {
-//                 console.log("failure callback 2")
-//                 failureCallback('Property Match not found.');
-//             }
-//             connection.release();
-//         });
-
-//     });
-
-// };
-
 db.searchProperty = function (property, successCallback, failureCallback) {
+    console.log("Data to be find in database.." ,property.data)
     Property.find({
     address: property.data.location,
     availableFrom :{ $lte: property.data.checkin},
     availableTo : {$gte: property.data.checkout} 
-    }
-    ).then(function (propertyFound,err) {
+    },function (err,propertyFound) {
             if (propertyFound) {
                 console.log("successCallback callback 2")
                 console.log("rows generated are" + propertyFound)
                 successCallback(propertyFound)
+                return;
             }
-            else {
+            else if(err){
                 console.log("failure callback 2")
                 failureCallback('Property Match not found.');
             }   
-    }, function(err){
+    }), function(err){
+        console.log("Not able to find data in db")
         console.log("error is",err)
         failureCallback(err)
-    })
-};
-
-//update
-
-// Userprofile.findOneAndUpdate(
-//     { username: req.body.username },
-//     {
-//       $set: {
-//         firstname: req.body.firstname,
-//         lastname: req.body.lastname,
-//         about: req.body.aboutme,
-//         company: req.body.company,
-//         school: req.body.school,
-//         hometown: req.body.hometown,
-//         languages: req.body.languages,
-//         gender: req.body.gender,
-//         city: req.body.city,
-//         phone: req.body.phone
-//       }
-//     },
-//     { new: true },
-//     (err, result) => {
-//       if (err) {
-//         console.log("Something wrong when updating data!");
-//         res.sendStatus(400).end();
-//       } else {
-//         console.log("Updated profile details are:", result);
-//         res.sendStatus(200).end();
-//       }
-//     }
-//   );
-  
-  //updat ends
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    }
+}
 
 
 db.updateProfile = function (form_values, successCallback, failureCallback) {
-    console.log("Updating profile of user : " + form_values.firstName)
-    pool.getConnection(function (err, connection) {
-        var sql = "UPDATE UserTable SET firstName = '" + form_values.firstName + "', lastName = '" + form_values.lastName +
-            "', comment='" + form_values.comment + "', country='" + form_values.country + "', company='" + form_values.company +
-            "',  school='" + form_values.school + "', hometown='" + form_values.hometown + "', languages='" + form_values.languages +
-            "', gender='" + form_values.gender + "' where email='" + form_values.email + "'";
+    console.log("Updating profile of user in database: " ,form_values)
 
-        console.log(sql);
-        connection.query(sql,
-            function (err, result) {
-                if (err) {
-                    console.log(err);
-                    console.log("in update failure block")
-                    failureCallback(err);
-                    return;
+    User.findOneAndUpdate({ email:  form_values.email},
+        {
+          $set: {
+            firstName: form_values.firstName,
+            lastName: form_values.lastName,
+            comment: form_values.comment,
+            country: form_values.country,
+            company: form_values.company,
+            school: form_values.school,
+            languages: form_values.languages,
+            gender: form_values.gender,
+            hometown: form_values.hometown,
+            phoneNumber: form_values.phoneNumber
+          }
+        },{ new: true }, function (err, result) {
+                if (result) {
+                    console.log(result);
+                    console.log("in update success block")
+
+                    console.log("result" + result);
+                    successCallback();
+                    return; //this is so important if we got the result just return , dont execute below calls
+                }else if(err)
+                {
+                console.log(err, "in update failure block error data below")
+                failureCallback();
                 }
-                console.log("in update success block")
-                console.log("result" + result);
-                successCallback();
-            });
 
-    }, function (err) {
+    }), function (err) {
         console.log(err);
-        failureCallback();  //callback of update profile
-    });
-    //connection.release();
-};
+        failureCallback();  
+    }
+}
 
 //mongo
 db.submitProperty = function (property, successCallback, failureCallback) {
@@ -263,27 +194,25 @@ db.submitProperty = function (property, successCallback, failureCallback) {
 
 db.findOwnersListedPropertyperty = function (property, successCallback, failureCallback) {
     console.log("owner id " + property.ownerid)
-    pool.getConnection(function (err, connection) {
-        var sqlQuery = "SELECT * FROM `Homeaway`.`property` WHERE `owner` = '" + property.ownerid + "';";
-        console.log("query result " + sqlQuery);
-        connection.query(sqlQuery, function (err, rows) {
-            if (err) {
-                console.log("failure callback 1")
-                failureCallback(err);
-                return;
-            }
-            if (rows.length > 0) {
-                successCallback(rows)
-            }
-            else {
-                console.log("failure callback 2")
-                failureCallback('Property not found.');
-            }
-            connection.release();
-        });
-
-    });
+    Property.find({
+        owner: property.ownerid       
+    }).then(function(property,err){
+        if(property){
+        console.log("property is ",property)
+        successCallback(property);}
+        else
+        {
+            console.log("err->",property)
+            console.log("error is",err)
+            failureCallback(err)
+        }
+    }, function(err) {
+        console.log("error is",err)
+        failureCallback(err)
+    })
 };
+
+
 
 db.findTravelerBookings = function (property, successCallback, failureCallback) {
     console.log("searching booked properties indatabase..")

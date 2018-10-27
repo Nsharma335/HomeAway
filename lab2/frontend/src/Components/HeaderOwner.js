@@ -5,9 +5,9 @@ import DropdownButton from 'react-dropdown'
 import 'react-dropdown/style.css';
 import SideNav, { Nav, NavIcon, NavText } from 'react-sidenav';
 import cookie from 'react-cookies';
+import { Link } from "react-router-dom";
 
-
-class HeaderBlue extends Component {
+class HeaderOwner extends Component {
     constructor(props) {
         super(props);
     }
@@ -23,26 +23,27 @@ class HeaderBlue extends Component {
     renderHeader() {
         console.log("props" + this.props.email)
 
-        if (cookie.load('cookieName')) {
-            var cookievalue = cookie.load('cookieName');
-            console.log("cookie value " + cookievalue);
-            var jsonobject = cookievalue.substring(2);
-            var parsedObject = JSON.parse(jsonobject);
-            console.log("jsonobject" + jsonobject);
-            console.log("parsed" + parsedObject.user_email + parsedObject.first_name);
+        console.log("props" + this.props.email)
+
+        if (this.props.authFlag) {
+            let details = this.props.userinfo.map(info => {
+                if(info!=null)
+                return(
+                    <span>{info.firstName}</span>
+              )})
 
             // console.log(arr.map(item => key = { item.label }, label = { item.label }, value = { item.value }));
             return (
                 <li class="dropdown" >
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#" style={{ color: "#337ab7" }}>
-                        {parsedObject.first_name} <span class="caret"></span>
+                    {details} <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
                         <li>
                             <button class="btn navbar-btm">
-                                <a href="/ownerDashboard" >
-                                    <span>See all properties</span>
-                                </a>
+                                <Link  to="/ownerDashboard">
+                                <span>See all properties</span>
+                            </Link>
                             </button>
                         </li>
 
@@ -68,16 +69,16 @@ class HeaderBlue extends Component {
                     <ul class="dropdown-menu">
                         <li>
                             <button class="btn navbar-btm">
-                                <a href="/travelerlogin" >
-                                    <span>Traveler Login</span>
-                                </a>
+                                <Link  to="/travelerlogin">
+                                Traveler Login
+                            </Link>
                             </button>
                         </li>
                         <li>
                             <button class="btn navbar-btm">
-                                <a href="/travelerlogin" >
-                                    <span>Owner Login</span>
-                                </a>
+                            <Link  to="/ownerlogin">
+                                Owner Login
+                            </Link>
                             </button>
                         </li>
                     </ul>
@@ -102,7 +103,9 @@ class HeaderBlue extends Component {
 
                             {this.renderHeader()}
 
-                            <li><button className="btn navbar-btn"><a href="/listYourProperty" style={{ textDecoration: "" }}>List Your Property</a></button></li>
+                            <li><button className="btn navbar-btn">
+                            <Link to="/listYourProperty" style={{ textDecoration: "" }}>List Your Property</Link>
+                            </button></li>
                             <li><a class="logo" href="">
                                 <img src={require('../img/iconblue.svg')}></img>
                             </a></li>
@@ -116,5 +119,14 @@ class HeaderBlue extends Component {
 }
 
 
-export default HeaderBlue
+const mapStateToProps = state =>{
+    console.log("State header user", state.user)
+    return {
+        authFlag : state.authFlag,
+        userinfo : state.user
+  
+    }
+  }
+  export default connect(mapStateToProps)(HeaderOwner);
+  
 

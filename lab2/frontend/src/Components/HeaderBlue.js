@@ -25,8 +25,9 @@ class HeaderBlue extends Component {
 
         if (this.props.authFlag) {
             let details = this.props.userinfo.map(info => {
+                if(info!=null)
                 return(
-                    <span>{info.user.email}</span>
+                    <span>{info.firstName}</span>
               )})
 
             // console.log(arr.map(item => key = { item.label }, label = { item.label }, value = { item.value }));
@@ -52,9 +53,9 @@ class HeaderBlue extends Component {
                         </li>
                         <li>
                             <button class="btn navbar-btm">
-                                <a href="/travelerTrips" >
-                                    <span>My Trips</span>
-                                </a>
+                            <Link  to="/travelerTrips">
+                                <span>My Trips</span>
+                            </Link>
                             </button>
                         </li>
                         <li>

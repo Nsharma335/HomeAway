@@ -109,8 +109,8 @@ const mapStateToProps = state =>{
     console.log("State", state)
     console.log("State user", state.authFlag)
     return {
-        authFlag : state.authFlag
-
+        authFlag : state.authFlag,
+       
     }
 }
 
@@ -120,8 +120,6 @@ const mapDispatchStateToProps = dispatch => {
             axios.post('http://localhost:3001/login', data,{ withCredentials: true })
                 .then((response) => {
                     console.log("response got from Kafkaa... ",response)
-                    // console.log("response retrieval authflag from Kafkaa... ",response.data.updatedList.authFlag)
-                    // console.log("response retrieval authflag from Kafkaa... ",response.data.updatedList.user.email)
                     if (response.data.updatedList.status === 403) {
                     console.log("Incorrect Credentials")
                     swal('Incorrect Password!', "Incorrect Credentials", 'error');

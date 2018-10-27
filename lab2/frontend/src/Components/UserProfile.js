@@ -5,6 +5,8 @@ import Swal from 'sweetalert2';
 import cookie from 'react-cookies';
 import ProfileImageUpload from './ProfileImageUpload';
 import { connect } from 'react-redux';
+import {Redirect} from 'react-router'; 
+import swal from 'sweetalert2'
 
  class UserProfile extends Component {
     constructor(props) {
@@ -90,29 +92,31 @@ import { connect } from 'react-redux';
         this.setState({ gender: e.target.value });
     }
     componentWillMount() {
-        if (this.props.authFlag==false) {
-            window.location.href = "http://localhost:3000/";
-        }
-        else {
-            this.loadUserDetails();
-        }
+    console.log("componentWillMount of UserProfile")
+     if(this.props.authFlag)
+     { 
+         this.loadUserDetails();
+     }
+     else
+     <Redirect to="/" />
+
     }
 
     loadUserDetails() {
+        console.log("loading details function called...")
         var self = this;
-
-        var cookievalue = cookie.load("cookieName");
-        var jsonobject = cookievalue.substring(2);
-        var parsedObject = JSON.parse(jsonobject);
-        var id = parsedObject.user_email;
+        var id=null;
+        let details= this.props.userinfo.map(user=> {
+            console.log("inside map email",user.email)
+            id = user.email
+        })
+        console.log("user email id fetched from store..",id)
         if (id != null) {
             axios.get("http://localhost:3001/getUserDetails?email=" + id)
                 .then(function (response) {
-                    if (response.data.rows != null) {
-                        console.log("if row returned from get user , come here")
-                        let user_detail = response.data.rows;
-                        console.log("response data email->" + response.data.rows.email);
-                        console.log("email from user_detail->" + user_detail.email);
+                    if (response.data.updatedList.rows  != null) {
+                        console.log("loadUserDetails loaded with values from db...")
+                        let user_detail = response.data.updatedList.rows ;
                         self.setState({
                             email: user_detail.email,
                             firstName: user_detail.firstName,
@@ -133,9 +137,16 @@ import { connect } from 'react-redux';
         }
     }
 
+//     componentWillMount(){
+// this.setState({
+//         email : this.props.userinfo[0].email
+// })
+//     }
+
+
     saveChanges = e => {
 
-        if (cookie.load('cookieName')) {
+        if (this.props.authFlag) {
             e.preventDefault();
             console.log("inside submit login from client side..")
             const data = {
@@ -151,64 +162,13 @@ import { connect } from 'react-redux';
                 languages: this.state.languages,
                 gender: this.state.gender
             };
-            console.log(data);
-            axios.post('http://localhost:3001/updateProfile', data, { withCredentials: true })
-                .then(response => {
-                    console.log("Status Code : ", response.status);
-                    if (response.data.success) {
-                        console.log("success")
-                        this.setState({
-                            authFlag: true
-
-                        });
-                        Swal('Updated Profile.', "Your profile has been updated successfully!", 'success');
-                        this.props.history.push('/userProfile');
-                    } else {
-                        console.log("error")
-                        this.setState({
-                            authFlag: false
-                        })
-                        Swal('Oops...', response.data.message, 'error');
-                    }
-                });
-        }
-    }
-
-    renderPopulatedData() {
-        console.log("render population")
-        if (cookie.load('cookieName')) {
-            return (
-                <div>
-                    <div className="row">
-                        <input type="text" class="form-control" onChange={this.firstNameChangeHandler} placeholder={this.state.firstName} name="firstName" />
-                    </div>
-                    <div id="firstName-error"></div>
-                    <div className="row">
-                        <input type="text" class="form-control" onChange={this.lastNameChangeHandler} placeholder={this.state.lastName} name="lastName" />
-                    </div>
-                    <div id="lastName-error"></div>
-                </div>
-            )
-        }
-        else {
-            return (
-                <div>
-                    <div>
-                        <input type="text" onChange={this.firstNameChangeHandler} class="form-control" name="firstName" />
-                    </div>
-                    <div id="firstName-error"></div>
-
-                    <div>
-                        <input type="text" onChange={this.lastNameChangeHandler} class="form-control" name="lastName" />
-                    </div>
-                    <div id="lastName-error"></div>
-                </div >
-            )
+           this.props.onSubmitHandle(data)
         }
     }
 
     render() {
         return (
+          
             <React.Fragment>
                 <HeaderBlue></HeaderBlue>
                 <center><h1>{this.state.firstName}&nbsp;{this.state.lastName}</h1></center>
@@ -225,57 +185,66 @@ import { connect } from 'react-redux';
                         align="center" >
                         < div class="user-profile" >
                             <h1>Profile Information</h1>
-                            {this.renderPopulatedData()}
+        
                             <div className="row">
-                                <input type="text" onChange={this.emailChangeHandler} class="form-control" name="email" value={this.state.email} />
+                        <input type="text" class="form-control" onChange={this.firstNameChangeHandler} placeholder={this.state.firstName} name="firstName" />
+                    </div>
+                    <div id="firstName-error"></div>
+                    <div className="row">
+                        <input type="text" class="form-control" onChange={this.lastNameChangeHandler} placeholder={this.state.lastName} name="lastName" />
+                    </div>
+                    <div id="lastName-error"></div>
+
+                            <div className="row">
+                                <input type="text" onChange={this.emailChangeHandler} class="form-control" name="email" value={this.props.userinfo[0].email} />
                             </div>
                             <div id="email-error"></div>
 
                             <div className="row">
-                                <input type="text" onChange={this.phoneNumberChangeHandler} class="form-control" name="phoneNumber" placeholder="phone number" />
+                                <input type="text" onChange={this.phoneNumberChangeHandler} class="form-control" name="phoneNumber" value={this.state.phoneNumber} placeholder="phone number" />
                             </div>
                             <div id="phoneNumber-error"></div>
 
                             <div className="row">
-                                <textarea class="form-control" onChange={this.commentChangeHandler} rows="5" name="comment" placeholder="About me"></textarea>
+                                <textarea class="form-control" onChange={this.commentChangeHandler} rows="5" name="comment" value={this.state.comment} placeholder="About me"></textarea>
                             </div>
                             <div id="comment-error"></div>
 
                             <div className="row">
-                                <input type="text" class="form-control" onChange={this.countryChangeHandler} name="country"
+                                <input type="text" class="form-control" onChange={this.countryChangeHandler} value={this.state.country} name="country"
                                     placeholder="My City, country" />
                             </div>
                             <div id="country-error"></div>
 
                             <div class="form-group row">
-                                <input type="text" class="form-control" onChange={this.companyChangeHandler} name="company"
+                                <input type="text" class="form-control" onChange={this.companyChangeHandler} value={this.state.company} name="company"
                                     placeholder="Company" />
                             </div>
                             <div id="company-error"></div>
 
                             <div class="form-group row">
-                                <input otype="text" class="form-control" onChange={this.schoolChangeHandler} name="school"
+                                <input otype="text" class="form-control" onChange={this.schoolChangeHandler} value={this.state.school} name="school"
                                     placeholder="School" />
                             </div>
                             <div id="school-error"></div>
 
                             <div class="form-group row">
-                                <input type="text" class="form-control" onChange={this.hometownChangeHandler} name="hometown"
+                                <input type="text" class="form-control" onChange={this.hometownChangeHandler} value={this.state.hometown} name="hometown"
                                     placeholder="Hometown" />
                             </div>
                             <div id="hometown-error"></div>
 
                             <div class="form-group row">
-                                <input type="text" class="form-control" onChange={this.languagesChangeHandler} name="languages"
+                                <input type="text" class="form-control" onChange={this.languagesChangeHandler} value={this.state.languages} name="languages"
                                     placeholder="Languages" />
                             </div>
                             <div id="languages-error"></div>
 
                             <div class="form-group row">
-                                <select className="form-control" name="gender" onChange={this.genderChangeHandler} >
+                                <select className="form-control" name="gender" onChange={this.genderChangeHandler} value={this.state.gender} >
                                     <option value="" disabled selected hidden>Gender</option>
-                                    <option value="0">Female</option>
-                                    <option value="1">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Male">Male</option>
                                 </select>
                             </div>
                             <div id="gender-error"></div>
@@ -304,4 +273,30 @@ const mapStateToProps = state =>{
   
     }
   }
-  export default connect(mapStateToProps)(UserProfile);
+  const mapDispatchStateToProps = dispatch => {
+    return {
+        onSubmitHandle : (data) => {
+
+            axios.post('http://localhost:3001/updateProfile', data,{ withCredentials: true })
+                .then((response) => {
+                    console.log("response got from Kafkaa... ",response)
+                    // console.log("response retrieval authflag from Kafkaa... ",response.data.updatedList.authFlag)
+                    // console.log("response retrieval authflag from Kafkaa... ",response.data.updatedList.user.email)
+                    if (response.data.updatedList.status === 200) {
+                   
+                    swal('Your profile updated successfully.', "Profile updated.", 'success');
+                         }
+                    if (response.data.updatedList.status === 400) {
+
+                    swal("Couldn't able to update the profile", "Internal server error.", 'error');
+                        }
+
+                        console.log("response fetched..", response.data.resData)
+                        dispatch({type: 'UPDATE_PROFILE',payload :response.data.updatedList, statusCode : response.status})
+                      
+            })
+        }
+    }
+}
+  
+  export default connect(mapStateToProps,mapDispatchStateToProps)(UserProfile);
