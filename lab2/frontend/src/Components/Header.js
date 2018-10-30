@@ -17,7 +17,7 @@ class Header extends Component {
   }
 
   handleSignOut(e) {
-    localStorage.clear();
+    // localStorage.clear();
     axios.get('http://localhost:3001/destroySession', { withCredentials: true })
       .then((response) => {
       })

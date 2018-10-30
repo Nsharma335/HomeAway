@@ -116,10 +116,13 @@ const mapStateToProps = state =>{
 
 const mapDispatchStateToProps = dispatch => {
     return {
+
         onSubmitHandle : (data) => {
+            axios.defaults.headers.common['Authorization']=localStorage.getItem("token")
             axios.post('http://localhost:3001/login', data,{ withCredentials: true })
                 .then((response) => {
                     console.log("response got from Kafkaa... ",response)
+                    localStorage.setItem("token",response.data.updatedList.token)
                     if (response.data.updatedList.status === 403) {
                     console.log("Incorrect Credentials")
                     swal('Incorrect Password!', "Incorrect Credentials", 'error');
@@ -130,7 +133,7 @@ const mapDispatchStateToProps = dispatch => {
                         }
 
                         console.log("response fetched..", response.data.resData)
-                        dispatch({type: 'USER_INFO',payload :response.data.updatedList, statusCode : response.status})
+                        dispatch({type: 'USER_INFO',payload :response.data.updatedList, statusCode : response.data.updatedList.status})
                       
             })
         }

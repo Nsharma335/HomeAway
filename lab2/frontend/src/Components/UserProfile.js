@@ -174,7 +174,7 @@ import swal from 'sweetalert2'
                 <center><h1>{this.state.firstName}&nbsp;{this.state.lastName}</h1></center>
                 <div align="center">
                     <div >
-                        <ProfileImageUpload />
+                        {/* <ProfileImageUpload /> */}
                     </div>
                 </div>
                 <div class="profile-form ">
@@ -276,7 +276,8 @@ const mapStateToProps = state =>{
   const mapDispatchStateToProps = dispatch => {
     return {
         onSubmitHandle : (data) => {
-
+            axios.defaults.headers.common["Authorization"] = localStorage.getItem("token" );
+          
             axios.post('http://localhost:3001/updateProfile', data,{ withCredentials: true })
                 .then((response) => {
                     console.log("response got from Kafkaa... ",response)

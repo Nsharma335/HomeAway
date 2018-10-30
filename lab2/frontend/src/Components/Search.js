@@ -15,7 +15,7 @@ class Search extends Component {
             checkin: "",
             checkout: "",
             guests: "",
-
+            data: [],
         };
         this.saveFormData = this.saveFormData.bind(this);
         this.locationChangeHandler = this.locationChangeHandler.bind(this);
@@ -74,7 +74,8 @@ class Search extends Component {
         this.props.onSubmitHandle(data)
         localStorage.setItem("checkin",this.state.checkin)
         localStorage.setItem("checkout",this.state.checkout)
-
+        localStorage.setItem("location",this.state.location)
+        localStorage.setItem("guests",this.state.guests )
     }
 
 
@@ -101,6 +102,7 @@ class Search extends Component {
                         <input type="text" onChange={this.guestHandler} className="form-control" value={this.state.guests} name="guests" placeholder="Guests" style={{ width: "100px", }}></input>
                     </div>
                     <button type="submit" className="btn btn-lg" onClick={this.saveFormData}>Search </button>
+                
                 </form>
             </div>
         )
@@ -123,6 +125,7 @@ const mapStateToProps = state =>{
     const mapDispatchStateToProps = dispatch => {
         return {
             onSubmitHandle : (data) => {
+               let self=this;
                 axios.post('http://localhost:3001/searchProperty', data,{ withCredentials: true })
                     .then((response) => {
                             console.log("response fetched ROWS..", response.data.updatedList)
@@ -130,6 +133,9 @@ const mapStateToProps = state =>{
                             {
                                 swal('There is no property with this criteria.', "No results", 'error');
                             }
+                           //self.setState({data: response.data.updatedList.rows })
+                           console.log("rows",response.data.updatedList.rows)
+
                             dispatch({type: 'SEARCH_RESULTS',payload :response.data.updatedList.rows, statusCode : response.data.updatedList.status})
                             console.log("dataaa", data)
                             dispatch({type: "SEARCH_PARAMETER", searchData : data})

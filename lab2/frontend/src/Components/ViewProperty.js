@@ -4,34 +4,63 @@ import Swal from 'sweetalert2';
 import { Link } from "react-router-dom";
 import HeaderBlue from './HeaderBlue';
 import Search from './Search';
+import Pagination from './Pagination'
 import { BrowserRouter as Router } from 'react-router-dom';
 import {Redirect} from 'react-router'; 
 import { connect } from 'react-redux';
 import swal from 'sweetalert2'
+import Filters from './Filters';
 
 class ViewProperty extends Component {
     constructor() {
         super();
         this.state = {
             data: [],
+            currentPage: 1, perPageRows: 2,
             imagesPreview: [],
-
         };
        // this.handleOnClickProperty = this.handleOnClickProperty.bind(this);
+       this.handlePageChange= this.handlePageChange.bind(this);
     }
 
-    // handleOnClickProperty(e) {
-    //     localStorage.setItem('property_id', e.target.dataset.id);
-    //     var id=e.target.dataset.id;
-    //     this.props.onSubmitHandle(id)
-    //    // <Redirect to="/bookProperty" />
-    //    // window.location.href = "http://localhost:3000/bookProperty"
-    // }
-  
+    handlePageChange(e) {
+        this.setState({currentPage: Number(e.target.dataset.id)})
+      }
+    
+      handleNextPaginationButton(e) {
+        const total_pages = this.state.data.length > 0 ? this.state.data.length/this.state.perPageRows : 0;
+        if(this.props.searchResults  != [] && this.state.currentPage != Math.ceil(total_pages)){
+          this.setState({currentPage: Number(this.state.currentPage + 1)})      
+        }
+      }
+    
+      handlePrevPaginationButton(e) {
+        if(this.props.searchResults != [] && this.state.currentPage != 1){
+          this.setState({currentPage: Number(this.state.currentPage - 1)})
+        }
+      }
+    
    
     render() {
-        let propertytList;
-        propertytList = this.props.searchResults.map(property => {
+        let propertytList, pagination_list=null;
+        const indexOfLastTodo = this.state.currentPage * this.state.perPageRows;
+        const indexOfFirstTodo = indexOfLastTodo - this.state.perPageRows;
+        const currentTodos = this.props.searchResults.slice(indexOfFirstTodo, indexOfLastTodo);
+        const total_pages = this.props.searchResults.length > 0 ? this.props.searchResults.length/this.state.perPageRows : 0;
+        const page_numbers = [];
+        for (let i = 1; i <= Math.ceil(this.props.searchResults.length / this.state.perPageRows); i++) {
+          page_numbers.push(i);
+        } 
+        for (let i = 1; i <= Math.ceil(this.state.data.length / this.state.perPageRows); i++) {
+            page_numbers.push(i);
+          }  
+          pagination_list = page_numbers.map(number => {
+            return (
+              <li class="page-item" key= {number} data-id={number} onClick={this.handlePageChange} ><a data-id={number} class="page-link" href="#">{number}</a></li>
+            );
+          });
+          if(currentTodos != null){
+        propertytList = currentTodos.map(property => {
             console.log("property",property)
             return (
                 <div>
@@ -75,7 +104,7 @@ class ViewProperty extends Component {
                 </div>
 
             );
-        });
+        })};
 
         if (this.state.data != null) {
             return (
@@ -84,8 +113,11 @@ class ViewProperty extends Component {
                     <div className="main-property-div" style={{ backgroundColor: '#f7f7f8' }}>
                         <HeaderBlue />
                         <Search />
+                        <label><Filters></Filters></label>
                         {propertytList}
                     </div>
+                    <Pagination handlePrevPaginationButton = {this.handlePrevPaginationButton.bind(this)} handleNextPaginationButton = {this.handleNextPaginationButton.bind(this)}
+          handlePageChange = {this.handlePageChange.bind(this)} pagination_list = {pagination_list}/>
                 </div >
             )
 
@@ -103,13 +135,5 @@ const mapStateToProps = state =>{
     }
 }
 
-// const mapDispatchStateToProps = dispatch => {
-//     return {
-//         onSubmitHandle : (data) => {
-                        
-//             dispatch({type: 'USER_INFO',payload :data})
-//         }
-//     }
-// }
 
 export default connect(mapStateToProps,null)(ViewProperty);

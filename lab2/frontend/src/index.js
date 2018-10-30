@@ -23,6 +23,7 @@ import OwnerLogin from './Components/OwnerLogin';
 import OwnerDashboard from './Components/OwnerDashboard';
 import ProfileImageUpload from './Components/ProfileImageUpload';
 import TravelerTrips from './Components/TravelerTrips';
+import Inbox from './Components/Inbox';
 import reducer from './store/reducer';
 import {Provider} from 'react-redux';
 import promise from "redux-promise";
@@ -56,7 +57,7 @@ ReactDOM.render(
                     <Route exact path="/ownerDashboard" component={OwnerDashboard} />
                     <Route exact path="/travelerTrips" component={TravelerTrips} />
                     <Route exact path="/photoUpload" component={ProfileImageUpload} />
-
+                    <Route exact path="/inbox" component={Inbox} />
                 </div>
             </Router>
         </Layout>

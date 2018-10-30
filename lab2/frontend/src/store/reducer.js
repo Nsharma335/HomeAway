@@ -9,7 +9,8 @@ const initalState = {
     guests: "",
     registered: false,
     userProfileUpdated: false,
-    propertyCreated: false
+    propertyCreated: false,
+    booked: false,
 }
 
 const reducer = (state = initalState,action) => {
@@ -23,6 +24,7 @@ const reducer = (state = initalState,action) => {
     }
 
     if(action.type === "SEARCH_RESULTS" && action.statusCode == 200){
+        state.searchResults=[];
         console.log("hello..")
         console.log("SEARCH_RESULTS action.payload" ,action.payload)
         return {
@@ -46,7 +48,6 @@ const reducer = (state = initalState,action) => {
         }
     }
 
-
     if(action.type === "REGISTER_USER" && action.statusCode == 200){
         return {
             ...state,
@@ -67,41 +68,14 @@ const reducer = (state = initalState,action) => {
             propertyCreated:true
         }
     }
+    if(action.type === "BOOKING_INFO" && action.statusCode == 201){
+        return {
+            ...state,
+            booked:true
+        }
+    }
     
-    if(action.type === "DELETE_BOOK" && action.statusCode == 200){
-        console.log("Data recieved : ", action.payload.data.books);
-        var b = new Array(action.payload.data.books.length);
-        for (var i = 0; i < action.payload.data.books.length; i++) {
-            b[i] = action.payload.data.books[i];
-        }
-        return {
-            ...state,
-            ...state.books,
-            books : b,
-            deletedFlag:true
-        }
-    }
-    if(action.type === "DELETE_BOOK" && action.statusCode == 400){
-        return {
-            ...state,
-            deletedFlag:false
-        }
-    }
-    if(action.type === "LOGOUT"){
-        return {
-            ...state,
-            authFlag : false,
-            bookCreated : false,
-            books : []
-        }
-    }
-    if(action.type === "HOME"){
-        return {
-            ...state,
-            bookCreated : false,
-            deletedFlag : false
-        }
-    }
+   
     return state;
 }
 

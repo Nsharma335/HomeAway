@@ -37,6 +37,15 @@ var User= mongoose.model('User',{
     gender: {
         type : String
         },
+    
+    MessageData:{
+            senderEmail: String,
+            senderFirstName: String,
+            senderLastName:String,
+            message:String,
+            created_on: Date,
+            propertyData: [],
+        }
 },"User")
 
 module.exports = {User};

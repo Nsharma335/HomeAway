@@ -15,20 +15,8 @@ export default class Location extends Component {
     }
 
     onFileStateChange(e) {
-        var self = this;
-        var selected = self.state.selectedFiles;
-        if (e.target.name == 'selectedFile') {
-            console.log("selected files are..." + e.target.files)
-            var combineFiles = selected.concat(...e.target.files);
-            console.log(combineFiles)
-            self.setState({ selectedFiles: combineFiles });
-        }
-        else {
-            this.setState({ [e.target.name]: e.target.value });
-        }
-        console.log("After combination of file array")
-        console.log(this.state.selectedFiles.length)
-
+     console.log("file selected..",e.target.files)
+     this.setState({selectedFiles: e.target.files})
     }
 
     handleAddressStateChange(e) {
@@ -43,12 +31,12 @@ export default class Location extends Component {
         console.log(this.state.selectedFiles)
         var data = {
             address: this.state.address,
+            selectedFiles:this.state.selectedFiles
         }
         console.log("data is " + JSON.stringify(data));
         console.log("field");
         this.props.saveFields(data);
         this.props.nextStep();
-        var files = this.state.selectedFiles
 
     }
 
@@ -56,16 +44,15 @@ export default class Location extends Component {
     uploadToServer(e) {
         e.preventDefault();
         const { selectedFiles } = this.state;
-        console.log("inside uplaod" + this.state.selectedFiles)
+        console.log("inside uplaod" , this.state.selectedFiles)
         let formData = new FormData();
-        formData.append('first', this.state.selectedFiles[0]);
-        formData.append("second", this.state.selectedFiles[1]);
-        formData.append("third", this.state.selectedFiles[2]);
-        formData.append("forth", this.state.selectedFiles[3]);
-        formData.append("fifth", this.state.selectedFiles[4]);
+       const files=this.state.selectedFiles;
+       for(var i=0;i<files.length;i++){
+           formData.append("files",files[i]);
+       }
         console.log("formData", formData);
 
-        axios.post('http://localhost:3001/multipleImage', formData)
+        axios.post('http://localhost:3001/upload', formData)
             .then((response) => {
                 console.log("here is the response body")
                 console.log(response.body)
@@ -94,7 +81,6 @@ export default class Location extends Component {
                             <h1 style={{ fontSize: "20px" }}>Property photos</h1>
 
                             <form onSubmit={this.uploadToServer}>
-
                                 <input
                                     type="file"
                                     enctype="multipart/form-data"

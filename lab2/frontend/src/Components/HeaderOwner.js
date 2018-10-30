@@ -13,7 +13,7 @@ class HeaderOwner extends Component {
     }
 
     handleSignOut(e) {
-        localStorage.clear();
+        //localStorage.clear();
         axios.get('http://localhost:3001/destroySession', { withCredentials: true })
             .then((response) => {
             })
@@ -39,6 +39,13 @@ class HeaderOwner extends Component {
                     {details} <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
+                    <li>
+                            <button class="btn navbar-btm">
+                                <Link  to="/inbox">
+                                <span>Inbox</span>
+                            </Link>
+                            </button>
+                        </li>
                         <li>
                             <button class="btn navbar-btm">
                                 <Link  to="/ownerDashboard">

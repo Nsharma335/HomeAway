@@ -91,6 +91,30 @@ db.searchProperty = function (property, successCallback, failureCallback) {
         failureCallback(err)
     }
 }
+db.searchPropertyWithFilters = function (property, successCallback, failureCallback) {
+    console.log("Data to be find in database with filters.." ,property.data)
+    Property.find({
+    baseRate: property.data.price,
+    address:property.data.location,
+    availableFrom :{ $lte: property.data.checkin},
+    availableTo : {$gte: property.data.checkout} 
+    },function (err,propertyFound) {
+            if (propertyFound) {
+                console.log("successCallback callback 2")
+                console.log("rows generated are" + propertyFound)
+                successCallback(propertyFound)
+                return;
+            }
+            else if(err){
+                console.log("failure callback 2")
+                failureCallback('Property Match not found.');
+            }   
+    }), function(err){
+        console.log("Not able to find data in db")
+        console.log("error is",err)
+        failureCallback(err)
+    }
+}
 
 
 db.updateProfile = function (form_values, successCallback, failureCallback) {
@@ -132,8 +156,9 @@ db.updateProfile = function (form_values, successCallback, failureCallback) {
 
 //mongo
 db.submitProperty = function (property, successCallback, failureCallback) {
+    console.log("images to store in db",property.images)
     console.log("Creating property inside database....")
-    console.log("availablefrom",property.availableFrom)
+    console.log("images to store in db",property.images)
     console.log("availablefrom",property.availableTo)
     var newProperty = new Property({
         address: property.address,
@@ -149,6 +174,7 @@ db.submitProperty = function (property, successCallback, failureCallback) {
         currency: property.currency,
         baseRate: property.baseRate,
         owner: property.email,
+        images: property.images
     });
     newProperty.save().then((propertyy)=> {
         console.log("Property created : ", propertyy);
@@ -162,34 +188,6 @@ db.submitProperty = function (property, successCallback, failureCallback) {
       }
 };
 
-//will be working back on this after kafka....
-// db.findProperty = function (property, successCallback, failureCallback) {
-//     console.log("fetching properties from Database..")
-//     Property.find({
-//         _id: property._id
-//         }
-
-//     pool.getConnection(function (err, connection) {
-//         var sqlQuery = "SELECT * FROM `Homeaway`.`property` WHERE `propertyId` = '" + property._id + "';";
-//         console.log("query result " + sqlQuery);
-//         connection.query(sqlQuery, function (err, rows) {
-//             if (err) {
-//                 console.log("failure callback 1")
-//                 failureCallback(err);
-//                 return;
-//             }
-//             if (rows.length > 0) {
-//                 successCallback(rows[0])
-//             }
-//             else {
-//                 console.log("failure callback 2")
-//                 failureCallback('Property not found.');
-//             }
-//             connection.release();
-//         });
-
-//     });
-// };
 
 
 db.findOwnersListedPropertyperty = function (property, successCallback, failureCallback) {
@@ -213,16 +211,35 @@ db.findOwnersListedPropertyperty = function (property, successCallback, failureC
 };
 
 
+//will be working back on this after kafka....
+db.findProperty = function (property, successCallback, failureCallback) {
+    console.log("fetching properties from Database..")
+    Property.find({
+        _id: property._id
+        }
+        ,function (err, rows) {
+            if (err) {
+                console.log("failure callback 1")
+                failureCallback(err);
+                return;
+            }
+            if (rows.length > 0) {
+                successCallback(rows[0])
+            }
+            else {
+                console.log("failure callback 2")
+                failureCallback('Property not found.');
+            }
+          
+        });
+};
+
 
 db.findTravelerBookings = function (property, successCallback, failureCallback) {
-    console.log("searching booked properties indatabase..")
-    pool.getConnection(function (err, connection) {
-
-        var sqlQuery = "Select * from booking INNER JOIN Property on (booking.propertyId = property.propertyId) where TravelerEmail = '"
-            + property.travelerId + "'";
-
-        console.log("query result " + sqlQuery);
-        connection.query(sqlQuery, function (err, rows) {
+    console.log("searching booked properties in database..", property.travelerId)
+   Property.find({
+        bookedBy:property.travelerId
+   }, function (err, rows) {
             if (err) {
                 console.log("failure callback 1")
                 failureCallback(err);
@@ -235,36 +252,72 @@ db.findTravelerBookings = function (property, successCallback, failureCallback) 
                 console.log("failure callback 2")
                 failureCallback('Booking not found.');
             }
-            connection.release();
-        });
-
-    });
+        })
 };
-
 
 db.BookProperty = function (property, successCallback, failureCallback) {
     console.log("storing to database...")
-    const insertQueryString =
-        "INSERT INTO `Homeaway`.`booking` (propertyId,TravelerEmail,checkIn,checkOut) VALUES ( " + mysql.escape(property.propertyId) + " , " +
-        mysql.escape(property.travelerId) + " , " +
-        mysql.escape(property.checkin) + " , " + mysql.escape(property.checkout) + " ); "
-    console.log(insertQueryString);
-    pool.getConnection(function (err, connection) {
-        connection.query(insertQueryString,
-            function (err) {
+    Property.findOneAndUpdate({
+        _id: property.propertyId
+    },{
+    $set: {
+        checkin: property.checkin,
+        checkout:property.checkout,
+        bookedBy: property.travelerId,
+        bookedOnPrice: property.totalPrice
+    }
+    },function (err,result) {
                 if (err) {
                     console.log(err);
                     failureCallback(err);
                     return;
                 }
+                else{
+                console.log(result)
                 successCallback();
+                }
             },
             function (err) {
                 console.log(err);
                 failureCallback();
             });
-        connection.release();
-    });
+    
+};
+
+db.SendMessageToOwner = function (message, successCallback, failureCallback) {
+    console.log("SendMessageToOwner storing to database...")
+    User.findOneAndUpdate({
+        _id: message.travelerEmail
+    },{
+    $set: {
+        MessageData: {
+            senderEmail: message.travelerEmail,
+            senderFirstName : message.firstName,
+            senderLastName:message.lastName,
+            message:message.messageData,
+            created_on: new Date(), 
+            propertyData : message.property,      
+        }
+    }
+    },function (err,result) {
+                if (err) {
+                    console.log("Not able to save messages")
+                    console.log(err);
+                    failureCallback(err);
+                    return;
+                }
+                else{
+                console.log("Message stored in db successfully.")
+                console.log(result)
+                successCallback(result);
+                }
+            },
+            function (err) {
+                console.log("Not able to find property in db.")
+                console.log(err);
+                failureCallback();
+            });
+    
 };
 
 

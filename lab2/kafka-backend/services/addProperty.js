@@ -2,10 +2,7 @@ var db = require('../../backend/db');
 
 function handle_request(msg, callback){
 console.log("handling add property by kafka...")
-var data = JSON.parse(msg.value);
-form_values = data.data;
-console.log("form_values",form_values)
-console.log("I have reached",data)
+
     console.log("backend owner" + msg.owner)
     var newProperty = {
         address: msg.address,
@@ -20,7 +17,8 @@ console.log("I have reached",data)
         propertyType: msg.propertyType,
         currency: msg.currency,
         baseRate: msg.baseRate,
-        email: msg.owner
+        email: msg.owner,
+        images:msg.images
     };
 
     console.log(newProperty);

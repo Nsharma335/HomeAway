@@ -1,8 +1,5 @@
 var connection = new require("./kafka/Connection");
 
-//topics files
-//var signin = require('./services/signin.js');
-//var Books = require('./services/books.js');
 var login = require("./services/login");
 var register = require("./services/register");
 var updateProfile = require("./services/updateProfile");
@@ -10,6 +7,10 @@ var searchProperty = require("./services/searchProperty");
 var addProperty = require("./services/addProperty");
 var propertyListedByOwner = require("./services/propertyListedByOwner");
 var getUserDetails = require("./services/getUserDetails");
+var bookProperty = require("./services/bookProperty");
+var travelerBookings = require("./services/travelerBookings");
+var searchWithFilters = require("./services/searchWithFilters");
+var sendMessageToOwner = require("./services/sendMessageToOwner");
 
 function handleTopicRequest(topic_name, fname) {
   //var topic_name = 'root_topic';
@@ -50,3 +51,7 @@ handleTopicRequest("search_property_topic", searchProperty);
 handleTopicRequest("add_property_topic", addProperty);
 handleTopicRequest("owner_listing_property_topic", propertyListedByOwner);
 handleTopicRequest("get_user_details_topic", getUserDetails);
+handleTopicRequest("book_property_topic", bookProperty);
+handleTopicRequest("traveler_bookings_topic",travelerBookings);
+handleTopicRequest("filter_property_topic", searchWithFilters);
+handleTopicRequest("send_message_to_owner_topic", sendMessageToOwner);

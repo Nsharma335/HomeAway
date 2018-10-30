@@ -10,13 +10,18 @@ module.exports = function (passport) {
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
         secretOrKey: config.secret
     };
-    passport.use(new JwtStrategy(opts, function (jwt_payload, callback) {
-        db.findUser({ username: jwt_payload.username }, function (res) {
-            var user = res;
-            delete user.password;
-            callback(null, user);
-        }, function (err) {
-            return callback(err, false);
+    passport.use(new JwtStrategy(opts, function (jwt_payload, done) {
+        console.log("jwt_payload.username",jwt_payload.email)
+        db.findUser({ 'email': jwt_payload.email }, function(err, user) {
+        if (err) {
+            return done(err, false);
+        }
+        if (user) {
+            return done(null, user);
+        } else {
+            return done(null, false);
+        }
         });
     }));
 };
+

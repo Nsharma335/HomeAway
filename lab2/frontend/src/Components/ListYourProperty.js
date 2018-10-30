@@ -28,11 +28,11 @@ class ListYourProperty extends Component {
                 bookingType: "",
                 currency: "",
                 baseRate: "",
-                
+                selectedFiles: [],
 
             },
-            selectedFiles: [],
-            images: [],
+           
+            imagenames: [],
             step: 1,
             //owner : ""
         };
@@ -40,11 +40,11 @@ class ListYourProperty extends Component {
         this.renderForm = this.renderForm.bind(this);
         this.saveFields = this.saveFields.bind(this);
         this.submitProperty = this.submitProperty.bind(this);
-        this.saveImage = this.saveImage.bind(this);
+       // this.saveImage = this.saveImage.bind(this);
 
     }
     renderForm() {
-        if (true) {
+     
             console.log("next step is " + this.state.step);
             switch (this.state.step) {
                 case 1:
@@ -74,42 +74,38 @@ class ListYourProperty extends Component {
 
                         fieldValues={this.state.fieldValues} /></div>)
             }
-        }
-        else {
-            console.log("please login to list your property");
-            window.location.href = "http://localhost:3000/travelerlogin";
-        }
+        
 
     }
 
     saveFields(fields) {
         var copydata = Object.assign({}, this.state.fieldValues, fields)
-        console.log("copying objects " + JSON.stringify(copydata));
+        //console.log("copying objects " + JSON.stringify(copydata));
         this.setState({
             fieldValues: copydata
         });
     }
-    saveImage(fields) {
-        var self = this;
-        console.log("data from child state" + fields.selectedFiles[0]);
-        var images = self.state.images;
-        var images = [];
-        var selectedFiles = []
-        selectedFiles = this.state.fieldValues.selectedFiles;
-        for (var i = 0; i < fields.selectedFiles.length; i++) {
-            console.log("fields name" + fields.selectedFiles[i].name);
-            // var join =this.state.selectedFiles.concat(...fields.selectedFiles)
-            images = images.concat(fields.selectedFiles[i].name.concat(","))
-            // this.setState({ imagesNames: addImage })
-        }
-        console.log("add images");
-        console.log(images.slice(0, -1));
-        console.log("images n names.." + images);
-        self.setState({ images })
-        console.log("this.images-> ", this.state.images)
-        console.log("Parent state of address " + this.state.fieldValues.address);
+    // saveImage(fields) {
+    //     var self = this;
+    //     console.log("data from child state" + fields.selectedFiles[0]);
+    //     var images = self.state.images;
+    //     var images = [];
+    //     var selectedFiles = []
+    //     selectedFiles = this.state.fieldValues.selectedFiles;
+    //     for (var i = 0; i < fields.selectedFiles.length; i++) {
+    //         console.log("fields name" + fields.selectedFiles[i].name);
+    //         // var join =this.state.selectedFiles.concat(...fields.selectedFiles)
+    //         images = images.concat(fields.selectedFiles[i].name.concat(","))
+    //         // this.setState({ imagesNames: addImage })
+    //     }
+    //     console.log("add images");
+    //     console.log(images.slice(0, -1));
+    //     console.log("images n names.." + images);
+    //     self.setState({ images })
+    //     console.log("this.images-> ", this.state.images)
+    //     console.log("Parent state of address " + this.state.fieldValues.address);
 
-    }
+    // }
     nextStep() {
         this.setState({
             step: this.state.step + 1
@@ -139,7 +135,14 @@ class ListYourProperty extends Component {
             id = user.email
             }
         })
-        
+        console.log("data is ",this.state.fieldValues)
+        const filenames=[];
+        for(var i=0;i<this.state.fieldValues.selectedFiles.length;i++)
+        {
+            filenames[i]=this.state.fieldValues.selectedFiles[i].name;
+        }
+        console.log("names of images..", filenames)
+        console.log("names of images..1st image", this.state.fieldValues.selectedFiles[0].name)
         const data = {
             address: this.state.fieldValues.address,
             headline: this.state.fieldValues.headline,
@@ -154,6 +157,7 @@ class ListYourProperty extends Component {
             currency: this.state.fieldValues.currency,
             baseRate: this.state.fieldValues.baseRate,
             owner: id,
+            images:filenames
         }
         this.props.onSubmitHandle(data)
     }

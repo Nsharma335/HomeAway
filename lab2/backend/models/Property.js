@@ -46,7 +46,19 @@ var Property= mongoose.model('Property',{
             },
     images: {
                 type : String
-                 }
+    },
+    checkin: {
+        type : String
+            },
+    checkout :{
+         type : String
+            },
+    bookedBy: {
+             type : String
+            },
+    bookedOnPrice: {
+                type : Number
+                 },
 },"Property")
 
 module.exports = {Property};

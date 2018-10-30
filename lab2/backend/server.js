@@ -32,16 +32,13 @@ const storage = multer.diskStorage({
         cb(null, './uploads');
     },
     filename: (req, file, cb) => {
-
-        // const newFilename = `test${path.extname(file.originalname)}`;
         cb(null, file.originalname);
     },
 });
 
 var upload = multer({ storage });
 
-// Set up middleware
-var requireAuth = passport.authenticate('jwt', { session: false });
+
 
 // Use body-parser to get POST requests for API use
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -54,11 +51,13 @@ app.use(morgan('dev'));
 console.log("here");
 //require('./app/routes')(app);
 app.use(passport.initialize());
+app.use(passport.session());
 
 // Bring in defined Passport Strategy
 require('./passport')(passport);
 
-
+// Set up middleware
+var requireAuth = passport.authenticate('jwt', { session: false });
 
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
@@ -86,21 +85,30 @@ app.post('/profilePhoto', upload.single('selectedFile'), (req, res) => {
     res.send();
 });
 
-app.post('/multipleImage', upload.any(), (req, res) => {
+app.post('/upload', upload.any(), (req, res) => {
     console.log("Req : ", req.body);
     console.log("Res : ", res.file);
     res.send();
 });
 
 app.post('/download/:file(*)', (req, res) => {
-    console.log("Inside download file");
-    var file = req.params.file;
-    var fileLocation = path.join(__dirname + '/uploads', file);
-    var img = fs.readFileSync(fileLocation);
-    var base64img = new Buffer(img).toString('base64');
+    console.log("Inside download file",req.params.file);
+    var file = req.params.file.split(",");
+    var base64imagesArray=[];
+    file.map(name=>{
+        var fileLocation = path.join(__dirname + '/uploads', name);
+        console.log("file location",fileLocation)
+ 
+        var img = fs.readFileSync(fileLocation);
+        var base64img = new Buffer(img).toString('base64');
+        base64imagesArray.push(base64img)
+    })
+    console.log("Images to be downloaded",base64imagesArray)
     res.writeHead(200, { 'Content-Type': 'image/jpg' });
-    res.end(base64img);
+    res.end(JSON.stringify(base64imagesArray));
 });
+
+
 
 app.post('/register', function (request, response) {
     console.log("Registering New User...")
@@ -124,7 +132,7 @@ app.post('/register', function (request, response) {
 });
 
 
-app.post('/login', function(request, response){
+app.post('/login',function(request, response){
     kafka.make_request('login_topic',request.body, function(err,results){
         console.log('in result');
         console.log(results);
@@ -147,7 +155,7 @@ app.post('/login', function(request, response){
 
 app.post('/updateProfile', function (request, response) {
     console.log("fetching user profile, you rcan start updating you profile..")
-    
+
     kafka.make_request('update_profile_topic',request.body, function(err,results){
         console.log('in result');
         console.log(results);
@@ -169,7 +177,9 @@ app.post('/updateProfile', function (request, response) {
 });
 
 
-app.get('/getUserDetails', function (request, response) {
+app.get('/getUserDetails', requireAuth,function (request, response) {
+    console.log("authenticating user...",request)
+    console.log("header data....".request.body);
 
     console.log("inside getUserDetails " + request.query.email);
     kafka.make_request('get_user_details_topic',request.query.email, function(err,results){
@@ -195,6 +205,31 @@ app.get('/getUserDetails', function (request, response) {
 app.post('/searchProperty', function (request, response) {
     console.log("Request search property for User : " );
     kafka.make_request('search_property_topic',request.body, function(err,results){
+        console.log('in result');
+        console.log(results);
+        if (err){
+            console.log("Inside err");
+            response.json({
+                status:"error",
+                msg:"System Error, Try Again."
+            })
+        }else{
+            console.log("Inside else");
+            console.log("results from kafka",results)
+            response.json({
+                    updatedList:results
+                });
+                response.end();
+            } 
+    });
+});
+
+
+
+
+app.post('/searchPropertyWithFilters', function (request, response) {
+    console.log("Request search property for User : " );
+    kafka.make_request('filter_property_topic',request.body, function(err,results){
         console.log('in result');
         console.log(results);
         if (err){
@@ -283,46 +318,97 @@ app.get('/ownersListedProperty', function (request, response) {
 app.get('/travelerBookings', function (request, response) {
 
     console.log(" travelerBooking email " + request.query.email);
-    db.findTravelerBookings({
-        travelerId: request.query.email
-    },  //success callback of finduser
-        function (rows) {
-            console.log("success callback of get user details");
-            console.log(rows)
-            response.status(200).json({ success: true, rows: rows });
-        }, //failure callback
-        function (err) {
-            console.log(err);
-            response.statusMessage = "No Bookings Found.";
-            response.status(204).end();
-
-        });
+    kafka.make_request('traveler_bookings_topic',request.query.email, function(err,results){
+        console.log('in result');
+        console.log(results);
+        if (err){
+            console.log("Inside err");
+            response.json({
+                status:"error",
+                msg:"System Error, Try Again."
+            })
+        }else{
+            console.log("Inside else");
+            console.log("results from kafka",results)
+            response.json({
+                    updatedList:results
+                });
+                response.end();
+            } 
+    });
 });
 
 
 app.post('/bookingProperty', function (request, response) {
-
-    console.log("Booking property for traveler... " + request.body.travelerEmail)
-
-    response.cookie('cookieName', "cookieValue", { maxAge: 90000000, httpOnly: false, path: '/' });
-    var bookingData = {
-        propertyId: request.body.propertyId,
-        travelerId: request.body.travelerEmail,
-        checkin: request.body.checkin,
-        checkout: request.body.checkout,
-        totalPrice: request.body.total
-    };
-
-    console.log(bookingData);
-
-    db.BookProperty(bookingData, function (res) {
-        response.status(201).json({ success: true, message: 'You have submitted your property successfully.' });
-    }, function (err) {
-        console.log(err);
-        return response.status(400).json({ success: false, message: 'property already exist.' });
+    console.log("Booking property for traveler... " + request.body)
+    kafka.make_request('book_property_topic',request.body, function(err,results){
+        console.log('in result');
+        console.log(results);
+        if (err){
+            console.log("Inside err");
+            response.json({
+                status:"error",
+                msg:"System Error, Try Again."
+            })
+        }else{
+            console.log("Inside else");
+            console.log("results from kafka",results)
+            response.json({
+                    updatedList:results
+                });
+                response.end();
+            } 
     });
 
 });
+
+app.post('/sendMessageToOwner', function (request, response) {
+    console.log("Sending message to owner... " + request.body)
+    kafka.make_request('send_message_to_owner_topic',request.body, function(err,results){
+        console.log('in result');
+        console.log(results);
+        if (err){
+            console.log("Inside err");
+            response.json({
+                status:"error",
+                msg:"System Error, Try Again."
+            })
+        }else{
+            console.log("Inside else");
+            console.log("results from kafka",results)
+            response.json({
+                    updatedList:results
+                });
+                response.end();
+            } 
+    });
+
+});
+
+// app.post('/sendMessageToOwner', function (request, response) {
+//     console.log("Sending message to owner... " + request.body)
+
+//     var messageObject = {
+//         propertyId: request.body.propertyId,
+//         firstName: request.body.firstName,
+//         lastName: request.body.lastName,
+//         travelerEmail: request.body.travelerEmail,
+//         messageData: request.body.message
+//     };
+
+//     console.log(messageObject);
+
+//     db.SendMessageToOwner(messageObject, function (res) {
+//         console.log("Message data",res)
+//         response.status(201).json({ success: true, message: 'Message sent.' });
+//     }, function (err) {
+//         console.log(err);
+//         return response.status(400).json({ success: false, message: "Coudn't send messages" });
+//     });
+
+// });
+
+
 
 //start your server on port 3001
 app.listen(3001);

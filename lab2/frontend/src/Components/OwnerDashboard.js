@@ -15,9 +15,7 @@ class OwnerDashboard extends Component {
             message: ""
         };
     }
-    componentWillMount() {
-      
-    }
+  
 
     componentDidMount() {
         if (this.props.authFlag)

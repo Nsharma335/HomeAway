@@ -18,13 +18,14 @@ function handle_request(msg, callback){
                    var token = jwt.sign(user, config.secret, {
                      expiresIn: 10080 // in seconds
                    });
+                   
                     //let cookie = { user_email: request.body.email, first_name: row.firstName, last_name: row.lastName };
                    // response.cookie('cookieName', cookie, { maxAge: 90000000, httpOnly: false, path: '/' });
                     console.log("user found..",row)
                     const resData = {
                         authFlag : true,
                         user : row,
-                       token: "JWT"+token,
+                       token: "Bearer "+token,
                         status: 200
                     }
                     callback(err,resData)
