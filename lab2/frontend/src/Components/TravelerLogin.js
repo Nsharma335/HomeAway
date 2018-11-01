@@ -118,7 +118,7 @@ const mapDispatchStateToProps = dispatch => {
     return {
 
         onSubmitHandle : (data) => {
-            axios.defaults.headers.common['Authorization']=localStorage.getItem("token")
+           
             axios.post('http://localhost:3001/login', data,{ withCredentials: true })
                 .then((response) => {
                     console.log("response got from Kafkaa... ",response)

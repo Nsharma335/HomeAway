@@ -6,6 +6,7 @@ import swal from 'sweetalert2';
 import cookie from 'react-cookies';
 import { connect } from 'react-redux';
 import moment from 'react-moment';
+import Message from './Message';
 
 class BookProperty extends Component {
     constructor(props) {
@@ -23,6 +24,7 @@ class BookProperty extends Component {
             lastName:"",
             email:"",
             message : "",
+            photos:[],
 
         };
      this.bookingProperty = this.bookingProperty.bind(this);
@@ -134,20 +136,47 @@ componentDidMount(){
         }
     })
 
-    var files=this.state.property.images
+    var files=[];
+    files=this.state.property.images.split(",");
+    console.log("array of images from db", files)
+
+    console.log("IMAGES in this state", files);
+
+    console.log("IMAGES in this state", files[0]);
+
+    console.log("IMAGES in this state", files[1]);
+
+    console.log("IMAGES in this state", files.length);
+
+    console.log("file name array first element", files);
+
     axios.post('http://localhost:3001/download/'+files).then(response=>
     {
-        console.log("response",response)
-        let imagePreview=[];
-        for(var i=0;i<response.data.length;i++)
-        {
-            imagePreview[i]="data:image/jpg:base64, "+response.data[i];
-        }
-        this.setState({
-                images:imagePreview
-            });
-        console.log("retrived images",this.state.images)
+      console.log("response",response)
+    //     let imagePreview=[];
+    //     for(var i=0;i<response.data.length;i++)
+    //     {
+    //         imagePreview[i]="data:image/jpg;charset=utf-8;base64,, "+response.data[i];
+    //     }
+    //     this.setState({
+    //             images:imagePreview
+    //         });
+    //     console.log("retrived images",this.state.images)
+    // })
+
+    let imageArr = []
+    for (let i = 0; i < response.data.length; i++) {
+      let imagePreview = 'data:image/jpg;charset=utf-8;base64, ' + response.data[i];
+                            imageArr.push(imagePreview);
+                            const photoArr = this.state.photos.slice();
+                            photoArr[i] = imagePreview;
+                            this.setState({
+                                photos: photoArr
+                            });
+                            console.log('Photo State: ', this.state.photos);
+              }
     })
+
 }
 
 sendMessage(){
@@ -174,19 +203,19 @@ console.log("checkin->" + this.state.availableFrom)
 console.log("checkin->" + this.state.availableTo)
 console.log("checkin->" + localStorage.getItem("checkin"))
 console.log("checkin->" + localStorage.getItem("checkout"))
-    
+console.log("retrieved images in render method",this.state.images)
+
         return (
             <div>
-               
              <HeaderBlue></HeaderBlue>
+            
                 <div className="container-fluid" style={{ marginTop: "-100px" }}  >
-
-
+               
                     <div className="col-md-8 bookclass" >
 
-                        <div style={{ marginTop: "9%"}}>
-                        <img src={this.state.images[1]} height="200px" width="200px" />
-                          
+                        <div>
+                        <img src={this.state.photos[0]} width="100px" height="100px" ></img>
+        
                         </div>
 
                         <hr></hr>
@@ -246,76 +275,12 @@ console.log("checkin->" + localStorage.getItem("checkout"))
                             <div style={{ marginBottom: "50px" }}>
                                 <button type="submit" className="btn" onClick={this.bookingProperty} >Book Now </button>
                             </div>
-
-
-
-
-                                               <div class="container">
-
-<button type="button" class="btn-primary " data-toggle="modal" data-target="#myModal" style={{ marginBottom: "50px" }}>
-Ask Owner a question</button>
-
-
-<div class="modal fade" id="myModal" role="dialog">
-  <div class="modal-dialog">
-  
-
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Ask Owner a Question</h4>
-      </div>
-      <div>
-                       
-                        </div>
-                            <div>
-                            &nbsp; <span>Check In</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                <input type="date" name="checkin"  value={this.state.property.availableFrom} onChange={this.checkInDateHandler} ></input>
-                            </div>
-                            <p></p>
-                            <div>
-                               
-                        </div>
-                            <div>
-                            &nbsp; <span> Check Out </span>&nbsp;
-                                <input type="date" name="checkout" value={this.state.property.availableTo} onChange={this.checkOutDateHandler}></input>
-                            </div>
-                            <p></p>
-
-                    <div >
-                    &nbsp; <span> First Name </span>&nbsp;
-                        <input type="text" class="form-control"  value={this.state.firstName} name="firstName" />
-                    </div>
-                  
-                    <div >
-                    &nbsp; <span> Last Name </span>&nbsp;
-                        <input type="text" class="form-control" value={this.state.lastName}  name="lastName" />
-                    </div>
-                    <div >
-                    &nbsp; <span> Email Address </span>&nbsp;
-                        <input type="text" class="form-control" value={this.state.email} name="lastName" />
-                    </div>
-
-      <div class="modal-body">
-      <textarea rows="5" name="message" placeholder="Message to Owner" value={this.state.message} onChange={this.messageHandler} style={{width:"500px"}}></textarea>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" onClick={this.sendMessage}>Send</button>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-    
-  </div>
-</div>
-
-</div>
+                            <Message sender={this.state.email} receiver ={this.state.property.owner} ></Message>
 
                         </div>
                     </form>
                 </div>
-
+              
             </div >
         );
 

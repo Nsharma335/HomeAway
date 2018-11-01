@@ -91,7 +91,7 @@ import swal from 'sweetalert2'
     genderChangeHandler(e) {
         this.setState({ gender: e.target.value });
     }
-    componentWillMount() {
+    componentDidMount() {
     console.log("componentWillMount of UserProfile")
      if(this.props.authFlag)
      { 
@@ -112,6 +112,7 @@ import swal from 'sweetalert2'
         })
         console.log("user email id fetched from store..",id)
         if (id != null) {
+            axios.defaults.headers.common["Authorization"] = localStorage.getItem("token" );
             axios.get("http://localhost:3001/getUserDetails?email=" + id)
                 .then(function (response) {
                     if (response.data.updatedList.rows  != null) {
@@ -196,7 +197,7 @@ import swal from 'sweetalert2'
                     <div id="lastName-error"></div>
 
                             <div className="row">
-                                <input type="text" onChange={this.emailChangeHandler} class="form-control" name="email" value={this.props.userinfo[0].email} />
+                                <input type="text" onChange={this.emailChangeHandler} class="form-control" name="email" />
                             </div>
                             <div id="email-error"></div>
 

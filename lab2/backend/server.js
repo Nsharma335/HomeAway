@@ -92,8 +92,11 @@ app.post('/upload', upload.any(), (req, res) => {
 });
 
 app.post('/download/:file(*)', (req, res) => {
+
     console.log("Inside download file",req.params.file);
+   console.log( typeof(req.params.file));
     var file = req.params.file.split(",");
+    console.log("file array",file)
     var base64imagesArray=[];
     file.map(name=>{
         var fileLocation = path.join(__dirname + '/uploads', name);
@@ -177,7 +180,7 @@ app.post('/updateProfile', function (request, response) {
 });
 
 
-app.get('/getUserDetails', requireAuth,function (request, response) {
+app.get('/getUserDetails',requireAuth, function (request, response) {
     console.log("authenticating user...",request)
     console.log("header data....".request.body);
 
@@ -362,7 +365,7 @@ app.post('/bookingProperty', function (request, response) {
 
 });
 
-app.post('/sendMessageToOwner', function (request, response) {
+app.post('/sendMessage', function (request, response) {
     console.log("Sending message to owner... " + request.body)
     kafka.make_request('send_message_to_owner_topic',request.body, function(err,results){
         console.log('in result');
@@ -381,6 +384,24 @@ app.post('/sendMessageToOwner', function (request, response) {
                 });
                 response.end();
             } 
+    });
+
+});
+
+
+app.get('/getMessage', function (request, response) {
+    console.log("fetching message to owner... " + request.query.id)
+    console.log("fetching message to owner... " + request.query.email)
+    var data = {
+      email: request.query.email
+    }
+    db.getMessage(data, function (res,err) {
+        console.log("Message data",res)
+        response.status(200).json({ success: true, message: 'Message retrieved.', res });
+
+    }, function (err) {
+        console.log(err);
+        return response.status(400).json({ success: false, message: "Coudn't read messages" });
     });
 
 });

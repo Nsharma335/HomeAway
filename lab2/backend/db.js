@@ -286,20 +286,17 @@ db.BookProperty = function (property, successCallback, failureCallback) {
 
 db.SendMessageToOwner = function (message, successCallback, failureCallback) {
     console.log("SendMessageToOwner storing to database...")
-    User.findOneAndUpdate({
-        _id: message.travelerEmail
-    },{
-    $set: {
-        MessageData: {
-            senderEmail: message.travelerEmail,
-            senderFirstName : message.firstName,
-            senderLastName:message.lastName,
-            message:message.messageData,
-            created_on: new Date(), 
-            propertyData : message.property,      
-        }
+    console.log("message to be stored in db is",message)
+    var msgdata= {
+        senderEmail: message.senderEmail,
+        senderFirstName:message.firstName,
+        senderLastName:message.lastName,
+        recipientEmail : message.receiver,
+        message:message.messageData,
+        created_on: new Date(),    
     }
-    },function (err,result) {
+    User.findOneAndUpdate({ email: message.receiver},
+        { $push: {MessageData: msgdata }},function (err,result) {
                 if (err) {
                     console.log("Not able to save messages")
                     console.log(err);
@@ -313,7 +310,7 @@ db.SendMessageToOwner = function (message, successCallback, failureCallback) {
                 }
             },
             function (err) {
-                console.log("Not able to find property in db.")
+                console.log("Not able to find user id.")
                 console.log(err);
                 failureCallback();
             });
@@ -321,6 +318,25 @@ db.SendMessageToOwner = function (message, successCallback, failureCallback) {
 };
 
 
+db.getMessage = function (user, successCallback, failureCallback) {
+    console.log("fetching properties from Database..")
+    User.findOne({
+        email: user.email       
+    }).then(function(userdata,err){
+        if(userdata){
+        console.log("found user ",userdata)
+        successCallback(userdata);}
+        else
+        {
+            console.log("err->",userdata)
+            console.log("error is",err)
+            failureCallback(err)
+        }
+    }, function(err) {
+        console.log("error is",err)
+        failureCallback(err)
+    })
+};
 
 
 

@@ -5,10 +5,10 @@ function handle_request(msg, callback){
     console.log("msg received",msg);
 
     var messageObject = {
-        propertyData: msg.property,
-        firstName: msg.firstName,
-        lastName:  msg.lastName,
-        travelerEmail: msg.travelerEmail,
+        senderFirstName: msg.senderFirstName,
+        senderLastName:  msg.senderLastName,
+        senderEmail: msg.sender,
+        receiver:msg.receiver,
         messageData: msg.message
     };
 

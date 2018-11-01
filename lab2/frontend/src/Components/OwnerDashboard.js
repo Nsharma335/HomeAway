@@ -58,17 +58,22 @@ class OwnerDashboard extends Component {
         console.log("this.state.data---> ",this.state.data.length)
         let propertytList;
         propertytList = this.state.data.map(property => {
-
             return (
                 <div>
+
+                  
                     <div className="container-fluid" style={{
                         borderRadius: "5px",
                         marginBottom: "20px",
                         width: "90%",
                         backgroundColor: "white",
-                        boxShadow: "0px 1px 3px rgba(0,0,0,.1)"
+                       
+                        boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"
+
                     }}>
                         <div className="row">
+                      
+                        
                             <div className="col-sm-2" >
                                 {/* <img src={require(`../Components/uploads/${property.images}`)} height="100px" /> */}
                             </div>
@@ -105,7 +110,15 @@ class OwnerDashboard extends Component {
             return (
                 <div>
                     <div className="main-property-div" style={{ backgroundColor: '#f7f7f8' }}>
+                   
                         <HeaderOwner />
+                        <div className="container-fluid" style={{marginLeft: "50px"}}>
+                        <input type="text" name="search" style={{width:"400px"}} placeholder="Search property by name" />
+                        <button  class="btn btn-primary">Search</button>
+                        </div>
+                      
+                                
+                        <p></p> <p></p>
                         {propertytList}
                     </div>
                 </div >

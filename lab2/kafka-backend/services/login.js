@@ -9,7 +9,8 @@ function handle_request(msg, callback){
             email: msg.email
 
         }, function (row) {
-            var user = { email: row.email, firstName: row.firstName, lastName: row.lastName };
+            var user = { email: row.email};
+           
             console.log("row email "+row.email + row.password)
             crypt.compareHash(msg.password, row.password, function (err, isMatch) {
                 console.log("inside compare hash");

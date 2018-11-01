@@ -38,14 +38,16 @@ var User= mongoose.model('User',{
         type : String
         },
     
-    MessageData:{
+    MessageData:[
+        {
             senderEmail: String,
-            senderFirstName: String,
-            senderLastName:String,
+            senderFirstName:String,
+            senderLastName : String,
+            recipientEmail:String,
             message:String,
             created_on: Date,
-            propertyData: [],
         }
+    ]
 },"User")
 
 module.exports = {User};
