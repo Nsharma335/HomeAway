@@ -13,17 +13,15 @@ module.exports = function(passport) {
     opts.secretOrKey = config.secret;
   
     passport.use(
-      new JwtStrategy(opts, (jwt_payload, done) => {
+      new JwtStrategy(opts, (jwt_payload, callback) => {
         console.log("jwt_payload.username",jwt_payload.email)
-        db.findUser({ email: jwt_payload.email })
-       console.log("user found in db..")
-          .then(user => {
-            if (user) {
-              return done(null, user);
-            }
-            return done(null, false);
-          })
-          .catch(err => console.log(err));
-      })
-    );
-  };
+        db.findUser({ email: jwt_payload.email },
+          function (res) {
+            var user = res;
+            delete user.password;
+            callback(null, user);
+        }, function (err) {
+            return callback(err, false);
+        });
+    }));
+};

@@ -1,12 +1,9 @@
 import React, { Component } from 'react'
 import axios from 'axios';
 import HeaderBlue from './HeaderBlue';
-import Search from './Search';
 import swal from 'sweetalert2';
-import cookie from 'react-cookies';
 import { connect } from 'react-redux';
-import moment from 'react-moment';
-import Message from './Message';
+import TravelerToOwnerMessage from './TravelerToOwnerMessage';
 
 class BookProperty extends Component {
     constructor(props) {
@@ -95,12 +92,6 @@ class BookProperty extends Component {
         }
     }
 
-// componentDidMount(){
-// console.log("local stoage checkin",this.state.property.checkin)
-// this.setState({checkin : localStorage.getItem("checkin")})
-// this.setState({checkout : localStorage.getItem("checkout")})
-// }
-
 componentWillMount(){
     console.log("this.state.checkin did mount",this.state.property.availableFrom)
     console.log("this.state.checkout did mount",this.state.property.availableTo)
@@ -137,33 +128,12 @@ componentDidMount(){
     })
 
     var files=[];
+    if(this.state.property.images.length>0){
     files=this.state.property.images.split(",");
-    console.log("array of images from db", files)
-
-    console.log("IMAGES in this state", files);
-
-    console.log("IMAGES in this state", files[0]);
-
-    console.log("IMAGES in this state", files[1]);
-
-    console.log("IMAGES in this state", files.length);
-
-    console.log("file name array first element", files);
 
     axios.post('http://localhost:3001/download/'+files).then(response=>
     {
-      console.log("response",response)
-    //     let imagePreview=[];
-    //     for(var i=0;i<response.data.length;i++)
-    //     {
-    //         imagePreview[i]="data:image/jpg;charset=utf-8;base64,, "+response.data[i];
-    //     }
-    //     this.setState({
-    //             images:imagePreview
-    //         });
-    //     console.log("retrived images",this.state.images)
-    // })
-
+    console.log("response",response)
     let imageArr = []
     for (let i = 0; i < response.data.length; i++) {
       let imagePreview = 'data:image/jpg;charset=utf-8;base64, ' + response.data[i];
@@ -177,6 +147,7 @@ componentDidMount(){
               }
     })
 
+}
 }
 
 sendMessage(){
@@ -194,16 +165,27 @@ sendMessage(){
     })
 }
 
-render() {
+renderImage()
+{
+    
+}
 
-console.log("property fetched" , this.state.property);
-console.log("checkin value" + this.state.checkin)
-console.log("checkin value" + this.state.checkout)
-console.log("checkin->" + this.state.availableFrom)
-console.log("checkin->" + this.state.availableTo)
-console.log("checkin->" + localStorage.getItem("checkin"))
-console.log("checkin->" + localStorage.getItem("checkout"))
-console.log("retrieved images in render method",this.state.images)
+render() {
+    var imagelist=null
+    if(this.state.photos.length>0)
+    {
+       console.log("if image",this.state.photos)
+       imagelist= this.state.photos.map(photo=>
+            {
+            return(
+        <img src={photo} width="150px" height="150px" style={{marginRight:"20px"}}></img>
+                )
+    })
+    }
+    else{
+        console.log("else image")  
+             imagelist=<img src= { require('../images/default-image.jpg') } width="150px" height="150px" ></img>
+    }
 
         return (
             <div>
@@ -214,10 +196,8 @@ console.log("retrieved images in render method",this.state.images)
                     <div className="col-md-8 bookclass" >
 
                         <div>
-                        <img src={this.state.photos[0]} width="100px" height="100px" ></img>
-        
+                      {imagelist}
                         </div>
-
                         <hr></hr>
                         <div><h1>Overview</h1></div>
 
@@ -275,7 +255,7 @@ console.log("retrieved images in render method",this.state.images)
                             <div style={{ marginBottom: "50px" }}>
                                 <button type="submit" className="btn" onClick={this.bookingProperty} >Book Now </button>
                             </div>
-                            <Message sender={this.state.email} receiver ={this.state.property.owner} ></Message>
+                            <TravelerToOwnerMessage sender={this.state.email} receiver ={this.state.property.owner} senderFirstName={this.state.firstName} senderLastName={this.state.lastName}></TravelerToOwnerMessage>
 
                         </div>
                     </form>

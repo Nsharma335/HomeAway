@@ -59,6 +59,13 @@ class Header extends Component {
                         </li>
                         <li>
                             <button class="btn navbar-btm">
+                            <Link  to="/travelerInbox">
+                            Inbox
+                            </Link>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="btn navbar-btm">
                                 <Link  to="/travelerTrips">
                                 <span>My Trips</span>
                             </Link>
@@ -79,7 +86,6 @@ class Header extends Component {
 
     else {
       return (
-
         <li class="dropdown" >
           <a class="dropdown-toggle" data-toggle="dropdown" href="#" style={{ color: "white" }}>
             Login <span class="caret"></span>

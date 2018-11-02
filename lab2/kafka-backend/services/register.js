@@ -11,9 +11,10 @@ function handle_request(msg, callback){
             success: false,
             status : 400
         }
-        callback(err,resData)
+        callback(null,resData)
        
-    } else {
+    } 
+    else {
         //response.cookie('cookieName', "cookieValue", { maxAge: 90000000, httpOnly: false, path: '/' });
         var newUser = {
             firstName: msg.firstName,

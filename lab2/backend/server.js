@@ -156,7 +156,7 @@ app.post('/login',function(request, response){
     });
 });
 
-app.post('/updateProfile', function (request, response) {
+app.post('/updateProfile',requireAuth,function (request, response) {
     console.log("fetching user profile, you rcan start updating you profile..")
 
     kafka.make_request('update_profile_topic',request.body, function(err,results){
@@ -180,10 +180,8 @@ app.post('/updateProfile', function (request, response) {
 });
 
 
-app.get('/getUserDetails',requireAuth, function (request, response) {
+app.get('/getUserDetails', requireAuth, function (request, response) {
     console.log("authenticating user...",request)
-    console.log("header data....".request.body);
-
     console.log("inside getUserDetails " + request.query.email);
     kafka.make_request('get_user_details_topic',request.query.email, function(err,results){
         console.log('in result');

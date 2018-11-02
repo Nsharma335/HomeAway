@@ -3,7 +3,7 @@ var db = require('../../backend/db');
 //Authenticate the user and get a JSON Web Token to include in the header of future requests.
 // send this service request to kafka , we used to send our service to databse directly before, now we are sending it to kafka.
 function handle_request(msg, callback){ {
-    console.log("fetching user profile, you rcan start updating you profile..")
+    console.log("fetching user profile, you can start updating you profile..")
     console.log(msg, "msg is..");
     let form_values = {
         firstName: msg.firstName,

@@ -20,8 +20,6 @@ function handle_request(msg, callback){
                      expiresIn: 10080 // in seconds
                    });
                    
-                    //let cookie = { user_email: request.body.email, first_name: row.firstName, last_name: row.lastName };
-                   // response.cookie('cookieName', cookie, { maxAge: 90000000, httpOnly: false, path: '/' });
                     console.log("user found..",row)
                     const resData = {
                         authFlag : true,
@@ -30,17 +28,17 @@ function handle_request(msg, callback){
                         status: 200
                     }
                     callback(err,resData)
-                    //response.status(200).json({ success: true, token: 'JWT ' + token , resData});
+                    
                 }
             else
                 {  console.log("inside err" ,err)
-                  // response.statusMessage = "Password did not match.";
+              
                   const resData={
                       status: 403,
                       message : "password did not match"
                   }
                    callback(err,resData)
-                  // response.status(401).end();
+               
                 }
             },
                 function (err) {

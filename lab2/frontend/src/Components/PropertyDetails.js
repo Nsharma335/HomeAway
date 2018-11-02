@@ -37,11 +37,19 @@ export default class PropertyDetails extends Component {
         console.log("data is " + JSON.stringify(data));
         console.log("field value" + this.props.fieldValues)
         this.props.saveFields(data);
+        let validateHeadlineError = !this.validateHeadline(this.state.headline) ? true : false;
+        validateHeadlineError ? "" : this.props.nextStep();
         this.props.nextStep();
 
     }
 
-
+    validateHeadline(headline){
+        if (headline.trim() == "") {
+            document.getElementById("headline-error").innerHTML = "Please enter the headline";
+            return false;
+        }
+        return true;
+    }
 
 
 
@@ -49,7 +57,7 @@ export default class PropertyDetails extends Component {
         return (
             <div>
                 <div className="container" style={{ backgroundColor: "#eee" }}>
-                    <div class="main-div form-group">
+                    <div class="main-div form-group" style={{   boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
                         <form>
                             <div>
                                 <h1 style={{ fontSize: "20px", textAlign: "left" }}>Describe your property</h1>
@@ -59,8 +67,8 @@ export default class PropertyDetails extends Component {
                             </div>
                             <div className="row">
                                 <input type="text" class="form-control" name="headline"
-                                    placeholder="Headline" onChange={this.handleStateChange} required="true" />
-                                <div id="accomodates-error" class="error"></div>
+                                    placeholder="Headline" onChange={this.handleStateChange} value={this.state.headline}  />
+                                <div id="headline-error" class="error"></div>
                             </div>
 
                             <div className="row">

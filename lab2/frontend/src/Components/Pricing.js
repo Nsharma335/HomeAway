@@ -53,13 +53,42 @@ export default class Pricing extends Component {
             currency: this.state.currency,
             baseRate: this.state.baseRate
         }
-
+        let validateAvailableFrom = !this.validateAvailableFrom(this.state.availableFrom) ? true : false;
+        let validateAvailableTo = !this.validateAvailableTo(this.state.availableTo) ? true : false;
+        let validatePrice = !this.validatePrice(this.state.baseRate) ? true : false;
         console.log("data is " + JSON.stringify(data));
         console.log("field");
         this.props.saveFields(data);
-        this.props.nextStep();
+        validateAvailableFrom || validateAvailableTo|| validatePrice? "" : this.props.nextStep();
+        //this.props.nextStep();
 
     }
+
+    validateAvailableFrom(date){
+        if (date.trim() == "") {
+            document.getElementById("availableFrom-error").innerHTML = "Please select the date";
+            return false;
+        }
+        return true;
+    }
+    validateAvailableTo(date){
+        if (date.trim() == "") {
+            document.getElementById("availableTo-error").innerHTML = "Please select the date";
+            return false;
+        }
+        return true;
+    }
+    validatePrice(price){
+        if (price.trim() == "") {
+            document.getElementById("baseRate-error").innerHTML = "Please enter the base rate";
+            return false;
+        }
+        return true;
+    }
+
+
+
+
     render() {
         return (
             <div>
@@ -71,7 +100,7 @@ export default class Pricing extends Component {
                         <div class="container">
                             <p></p>
 
-                            <div class="main-div">
+                            <div class="main-div" style={{boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
 
                                 <div>
                                     <div class="radio-inline ">
@@ -84,14 +113,14 @@ export default class Pricing extends Component {
                                 </div>
                                 <div className="row">
                                     Available from :
-                                <input onChange={this.availableFromChange} type="Date" class="form-control" name="availableFrom"
-                                        required="true" />
+                                <input onChange={this.availableFromChange} value={this.state.availableFrom} type="Date" class="form-control" name="availableFrom"
+                                         />
                                 </div>
                                 <div id="availableFrom-error"></div>
                                 <div className="row">
                                     Available to :
-                                <input onChange={this.availableToChange} type="Date" class="form-control" name="availableTo"
-                                        required="true" />
+                                <input onChange={this.availableToChange} value={this.state.availableTo} type="Date" class="form-control" name="availableTo"
+                                       />
                                     <div id="availableTo-error"></div>
 
                                 </div >
@@ -117,7 +146,7 @@ export default class Pricing extends Component {
                                 </div>
                                 <div id="currency-error" ></div>
                                 <div className="row">
-                                    Nigtly Base rate <input type="text" id="price" name="baseRate" onChange={this.baseRateChangeHandler}></input>
+                                    Nigtly Base rate <input type="text" id="price" name="baseRate" onChange={this.baseRateChangeHandler} value={this.state.baseRate}></input>
                                 </div>
                                 <div id="baseRate-error"></div>
 

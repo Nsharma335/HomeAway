@@ -53,6 +53,13 @@ class HeaderBlue extends Component {
                         </li>
                         <li>
                             <button class="btn navbar-btm">
+                            <Link  to="/travelerInbox">
+                            Inbox
+                            </Link>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="btn navbar-btm">
                             <Link  to="/travelerTrips">
                                 <span>My Trips</span>
                             </Link>

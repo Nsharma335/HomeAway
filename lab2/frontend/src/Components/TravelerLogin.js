@@ -25,15 +25,29 @@ class TravelerLogin extends Component {
 
         this.setState({ email: e.target.value });
         console.log("email change handlet" + this.state.email)
-        e.target.value == "" ? document.getElementById("email-error").innerHTML = "Please enter your email" :
+        e.target.value == "" ? document.getElementById("email-error").innerHTML = "Please enter the field" :
             document.getElementById("email-error").innerHTML = "";
     }
     passwordChangeHandler(e) {
         this.setState({ password: e.target.value });
-        e.target.value == "" ? document.getElementById("password-error").innerHTML = "Please enter your password" :
+        e.target.value == "" ? document.getElementById("password-error").innerHTML = "Please enter the field" :
             document.getElementById("password-error").innerHTML = "";
     }
 
+    validateEmail(email){
+        if (email.trim() == "") {
+            document.getElementById("email-error").innerHTML = "Please enter your email address";
+            return false;
+        }
+        return true;
+    }
+    validatePassword(password){
+        if (password.trim() == "") {
+            document.getElementById("password-error").innerHTML = "Please enter your password";
+            return false;
+        }
+        return true;
+    }
 
     submitLogin = (e) => {
         //prevent page from refresh
@@ -44,7 +58,10 @@ class TravelerLogin extends Component {
             email : this.state.email,
             password : this.state.password
         }
-        this.props.onSubmitHandle(data)
+        let emailErrorPresent = !this.validateEmail(this.state.email) ? true : false;
+        let passwordErrorPresent = !this.validatePassword(this.state.password) ? true : false;
+        emailErrorPresent || passwordErrorPresent? "" : this.props.onSubmitHandle(data);
+        
     }
 
 

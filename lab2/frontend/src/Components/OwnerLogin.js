@@ -22,35 +22,29 @@ class OwnerLogin extends Component {
 
         this.setState({ email: e.target.value });
         console.log("email change handlet" + this.state.email)
-        e.target.value == "" ? document.getElementById("email-error").innerHTML = "Please enter your email" :
+        e.target.value == "" ? document.getElementById("email-error").innerHTML = "Please enter the field" :
             document.getElementById("email-error").innerHTML = "";
     }
     passwordChangeHandler(e) {
         this.setState({ password: e.target.value });
-        e.target.value == "" ? document.getElementById("password-error").innerHTML = "Please enter your password" :
+        e.target.value == "" ? document.getElementById("password-error").innerHTML = "Please enter the field" :
             document.getElementById("password-error").innerHTML = "";
     }
-    validateEmail() {
-        if (this.state.email == "") {
-            document.getElementById("email-error").innerHTML = "Please enter your email";
+    validateEmail(email){
+        if (email.trim() == "") {
+            document.getElementById("email-error").innerHTML = "Please enter your email address";
             return false;
         }
-        else {
-            document.getElementById("email-error").innerHTML = "";
-            return true;
-        }
+        return true;
     }
-
-    validatePassword() {
-        if (this.state.password == "") {
+    validatePassword(password){
+        if (password.trim() == "") {
             document.getElementById("password-error").innerHTML = "Please enter your password";
             return false;
         }
-        else {
-            document.getElementById("password-error").innerHTML = "";
-            return true;
-        }
+        return true;
     }
+
 
 
     submitLogin = e => {
@@ -63,33 +57,9 @@ class OwnerLogin extends Component {
         };
         console.log("user " + data.email + " pwd " + data.password)
         console.log("with credentials true")
-
-        // axios.post('http://localhost:3001/login', data, { withCredentials: true })
-        //     .then(response => {
-
-        //         console.log("Status Code : ", response.status);
-        //         if (response.data.success) {
-        //             console.log("success")
-        //             this.setState({
-        //                 authFlag: true,
-
-        //             });
-        //             window.location.href = "http://localhost:3000/ownerDashboard";
-
-        //         } else {
-        //             console.log("error")
-        //             this.setState({
-        //                 authFlag: false
-        //             })
-        //             swal({
-        //                 type: 'error',
-        //                 title: 'Wrong Credentials.',
-        //                 text: 'You entered invalid credentials or your email not registered!'
-        //             })
-        //         }
-        //     });
-
-        this.props.onSubmitHandle(data);
+        let emailErrorPresent = !this.validateEmail(this.state.email) ? true : false;
+        let passwordErrorPresent = !this.validatePassword(this.state.password) ? true : false;
+        emailErrorPresent || passwordErrorPresent? "" : this.props.onSubmitHandle(data);
     }
 
 

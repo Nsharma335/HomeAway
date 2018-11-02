@@ -16,10 +16,9 @@ class ViewProperty extends Component {
         super();
         this.state = {
             data: [],
-            currentPage: 1, perPageRows: 2,
-            imagesPreview: [],
+            currentPage: 1, perPageRows: 10,
+            photos: [],
         };
-       // this.handleOnClickProperty = this.handleOnClickProperty.bind(this);
        this.handlePageChange= this.handlePageChange.bind(this);
     }
 
@@ -39,6 +38,29 @@ class ViewProperty extends Component {
           this.setState({currentPage: Number(this.state.currentPage - 1)})
         }
       }
+
+//       componentDidMount(){
+//         var files=[];
+//         if(this.props.searchResults.images.length>0){
+//         files=this.props.searchResults.images.split(",");
+    
+//         axios.post('http://localhost:3001/download/'+files).then(response=>
+//         {
+//         console.log("response",response)
+//         let imageArr = []
+//         for (let i = 0; i < response.data.length; i++) {
+//           let imagePreview = 'data:image/jpg;charset=utf-8;base64, ' + response.data[i];
+//                                 imageArr.push(imagePreview);
+//                                 const photoArr = this.state.photos.slice();
+//                                 photoArr[i] = imagePreview;
+//                                 this.setState({
+//                                     photos: photoArr
+//                                 });
+//                                 console.log('Photo State: ', this.state.photos);
+//                   }
+//         })
+//     }
+// }
     
    
     render() {
@@ -61,6 +83,15 @@ class ViewProperty extends Component {
           });
           if(currentTodos != null){
         propertytList = currentTodos.map(property => {
+            var image_tag = null;
+            console.log("property",property.images)
+            if(property.images.length >0){
+                var splitimage=property.images.split(",")
+                image_tag = <img  src= { require('../../../backend/uploads/' + splitimage[0]) } width="150px" height="150px" ></img>            
+              }
+              else{
+                image_tag = <img src= { require('../images/default-image.jpg') } width="150px" height="150px" ></img>
+              }
             console.log("property",property)
             return (
                 <div>
@@ -73,9 +104,7 @@ class ViewProperty extends Component {
                     }}>
                         <div className="row">
                             <div className="col-sm-2" >
-
-                                {/* <img src={require(`../Components/uploads/${property.images}`)} height="100px" /> */}
-                                {/* <img src={this.state.imagesPreview} height="100px" /> */}
+                            {image_tag}
                             </div>
                             <div className="col-sm-10 nameview">
                                 <div>
@@ -86,7 +115,7 @@ class ViewProperty extends Component {
                                              property: property
                                              }
                                              }} 
-                                             role="button">{property.headline}</Link>
+                                             role="button">{property.address}</Link>
                                 </div>
                                 <div className="displayRow">
                                     <div id="below">{property.headline}</div>
@@ -113,7 +142,7 @@ class ViewProperty extends Component {
                     <div className="main-property-div" style={{ backgroundColor: '#f7f7f8' }}>
                         <HeaderBlue />
                         <Search />
-                        <label><Filters></Filters></label>
+                        <center><Filters></Filters></center>
                         {propertytList}
                     </div>
                     <Pagination handlePrevPaginationButton = {this.handlePrevPaginationButton.bind(this)} handleNextPaginationButton = {this.handleNextPaginationButton.bind(this)}

@@ -58,8 +58,13 @@ constructor(props){
     return (
       <div>
    
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong" style={{marginTop:"-300px"}}>
- More Filetrs
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong" style={{marginTop:"-300px",
+    borderRadius: "35px",
+    backgroundColor: "rgb(0,103,219)",
+    color: "white",
+    width: "100px"
+}}>
+ More Filters
 </button>
 
 

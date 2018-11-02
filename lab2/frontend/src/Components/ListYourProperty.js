@@ -117,7 +117,6 @@ class ListYourProperty extends Component {
         return (
             <div>
                 <HeaderOwner />
-                <SideNavBarProperty />
                 {this.renderForm()}
             </div>
         )
@@ -142,7 +141,7 @@ class ListYourProperty extends Component {
             filenames[i]=this.state.fieldValues.selectedFiles[i].name;
         }
         console.log("names of images..", filenames)
-        console.log("names of images..1st image", this.state.fieldValues.selectedFiles[0].name)
+        //console.log("names of images..1st image", this.state.fieldValues.selectedFiles[0].name)
         const data = {
             address: this.state.fieldValues.address,
             headline: this.state.fieldValues.headline,

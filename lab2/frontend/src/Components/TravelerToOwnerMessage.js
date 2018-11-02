@@ -2,19 +2,19 @@ import React, { Component } from 'react'
 import axios from 'axios';
 import swal from 'sweetalert2'
 
-export default class Message extends Component {
+export default class TravelerToOwner extends Component {
     constructor(props) {
         super(props)
         this.state = {
             recipientEmail:"",
             senderEmail:"",
             message:"",
-            senderFirstName:"",
-            senderLastName:"",
         }
         this.messageHandler = this.messageHandler.bind(this);
         this.sendMessage = this.sendMessage.bind(this);
+        
     }
+  
 
     messageHandler(e){
         this.setState({ message: e.target.value });
@@ -28,27 +28,27 @@ export default class Message extends Component {
     }
 
     sendMessage(){
-var data= {
-    receiver: this.state.recipientEmail,
-    sender:this.state.senderEmail,
-    message:this.state.message,
-    senderFirstName:this.props.senderFirstName,
-    senderLastName:this.props.senderLastName
-
-}
-
-axios.post('http://localhost:3001/sendMessage',data).then(response=>
-{
-    console.log("response",response.data.updatedList.status)
-    if(response.data.updatedList.status==200)
-    {
-        swal('Your message has been sent successfully', "Your message has been sent successfully", 'success');
-    }
-    else{
-        swal("Sorry, couldn't send your message", "please try again", 'error');
-    }
-})
-    }
+        var data= {
+            receiver: this.state.recipientEmail,
+            sender:this.state.senderEmail,
+            message:this.state.message,
+            senderFirstName:this.props.senderFirstName,
+            senderLastName:this.props.senderLastName
+        
+        }
+        console.log("data to be sent from compnent",data)
+        axios.post('http://localhost:3001/sendMessage',data).then(response=>
+        {
+            console.log("response",response.data.updatedList.status)
+            if(response.data.updatedList.status==200)
+            {
+                swal('Your message has been sent successfully', "Your message has been sent successfully", 'success');
+            }
+            else{
+                swal("Sorry, couldn't send your message", "please try again", 'error');
+            }
+        })
+            }
 
 
 
@@ -59,7 +59,7 @@ axios.post('http://localhost:3001/sendMessage',data).then(response=>
 <div class="container">
 
 <button type="button" class="btn-primary " data-toggle="modal" data-target="#myModal" style={{ marginBottom: "50px" }}>
-Ask Owner a question</button>
+Ask question to owner</button>
 
 
 <div class="modal fade" id="myModal" role="dialog">
@@ -69,13 +69,13 @@ Ask Owner a question</button>
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Ask Owner a Question</h4>
+        <h4 class="modal-title">Ask your question</h4>
       </div>
       <div>
          </div>
                            
                     <div >
-                    &nbsp; <span> Receipent's email address </span>&nbsp;
+                    &nbsp; <span> Recipient's email address </span>&nbsp;
                         <input type="text" class="form-control" value={this.props.receiver} name="lastName" />
                     </div>
                     <p> </p>

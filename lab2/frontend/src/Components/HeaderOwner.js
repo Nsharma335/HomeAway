@@ -41,7 +41,7 @@ class HeaderOwner extends Component {
                     <ul class="dropdown-menu">
                     <li>
                             <button class="btn navbar-btm">
-                                <Link  to="/inbox">
+                                <Link  to="/ownerInbox">
                                 <span>Inbox</span>
                             </Link>
                             </button>

@@ -36,8 +36,8 @@ export default class Location extends Component {
         console.log("data is " + JSON.stringify(data));
         console.log("field");
         this.props.saveFields(data);
-        this.props.nextStep();
-
+        let validateAddressError = !this.validateAddress(this.state.address) ? true : false;
+        validateAddressError ? "" : this.props.nextStep();
     }
 
 
@@ -61,6 +61,13 @@ export default class Location extends Component {
             });
     }
 
+    validateAddress(address){
+        if (address.trim() == "") {
+            document.getElementById("address-error").innerHTML = "Please enter the address";
+            return false;
+        }
+        return true;
+    }
 
     render() {
         return (
@@ -68,10 +75,10 @@ export default class Location extends Component {
                 <div class="container" style={{ backgroundColor: "#eee" }}>
 
                     <div>
-                        <div class="main-div" >
+                        <div class="main-div" style={{   boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
                             <h1 style={{ fontSize: "20px" }}>Address</h1>
-                            <input onChange={this.handleAddressStateChange} type="text" class="form-control" name="address"
-                                placeholder="Address" required="true" required="true" />
+                            <input onChange={this.handleAddressStateChange} value={this.state.address} type="text" class="form-control" name="address"
+                                placeholder="Address"  />
                             <div id="address-error" class="error"></div>
                             <p></p>
                             <p></p>
@@ -87,6 +94,7 @@ export default class Location extends Component {
                                     name="selectedFile"
                                     onChange={this.onFileStateChange}
                                     multiple
+                                   
                                 />
                                 <p></p>
                                 <button type="submit">Upload property photos</button>

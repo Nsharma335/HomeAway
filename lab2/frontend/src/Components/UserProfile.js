@@ -109,9 +109,12 @@ import swal from 'sweetalert2'
         let details= this.props.userinfo.map(user=> {
             console.log("inside map email",user.email)
             id = user.email
+            
         })
         console.log("user email id fetched from store..",id)
         if (id != null) {
+            this.setState({email:id})
+            console.log("inside if..")
             axios.defaults.headers.common["Authorization"] = localStorage.getItem("token" );
             axios.get("http://localhost:3001/getUserDetails?email=" + id)
                 .then(function (response) {
@@ -138,11 +141,6 @@ import swal from 'sweetalert2'
         }
     }
 
-//     componentWillMount(){
-// this.setState({
-//         email : this.props.userinfo[0].email
-// })
-//     }
 
 
     saveChanges = e => {
@@ -197,7 +195,7 @@ import swal from 'sweetalert2'
                     <div id="lastName-error"></div>
 
                             <div className="row">
-                                <input type="text" onChange={this.emailChangeHandler} class="form-control" name="email" />
+                                <input type="text" value={this.state.email} class="form-control" name="email" />
                             </div>
                             <div id="email-error"></div>
 
