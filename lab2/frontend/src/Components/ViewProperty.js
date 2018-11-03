@@ -20,6 +20,8 @@ class ViewProperty extends Component {
             photos: [],
         };
        this.handlePageChange= this.handlePageChange.bind(this);
+       this.handleNextPaginationButton= this.handleNextPaginationButton.bind(this);
+       this.handlePrevPaginationButton= this.handlePrevPaginationButton.bind(this);
     }
 
     handlePageChange(e) {
@@ -39,30 +41,6 @@ class ViewProperty extends Component {
         }
       }
 
-//       componentDidMount(){
-//         var files=[];
-//         if(this.props.searchResults.images.length>0){
-//         files=this.props.searchResults.images.split(",");
-    
-//         axios.post('http://localhost:3001/download/'+files).then(response=>
-//         {
-//         console.log("response",response)
-//         let imageArr = []
-//         for (let i = 0; i < response.data.length; i++) {
-//           let imagePreview = 'data:image/jpg;charset=utf-8;base64, ' + response.data[i];
-//                                 imageArr.push(imagePreview);
-//                                 const photoArr = this.state.photos.slice();
-//                                 photoArr[i] = imagePreview;
-//                                 this.setState({
-//                                     photos: photoArr
-//                                 });
-//                                 console.log('Photo State: ', this.state.photos);
-//                   }
-//         })
-//     }
-// }
-    
-   
     render() {
         let propertytList, pagination_list=null;
         const indexOfLastTodo = this.state.currentPage * this.state.perPageRows;
@@ -72,10 +50,7 @@ class ViewProperty extends Component {
         const page_numbers = [];
         for (let i = 1; i <= Math.ceil(this.props.searchResults.length / this.state.perPageRows); i++) {
           page_numbers.push(i);
-        } 
-        for (let i = 1; i <= Math.ceil(this.state.data.length / this.state.perPageRows); i++) {
-            page_numbers.push(i);
-          }  
+        }  
           pagination_list = page_numbers.map(number => {
             return (
               <li class="page-item" key= {number} data-id={number} onClick={this.handlePageChange} ><a data-id={number} class="page-link" href="#">{number}</a></li>
@@ -90,7 +65,7 @@ class ViewProperty extends Component {
                 image_tag = <img  src= { require('../../../backend/uploads/' + splitimage[0]) } width="150px" height="150px" ></img>            
               }
               else{
-                image_tag = <img src= { require('../images/default-image.jpg') } width="150px" height="150px" ></img>
+                image_tag = <img src= { require('../images/default-property.png') } width="150px" height="150px" ></img>
               }
             console.log("property",property)
             return (
@@ -108,7 +83,7 @@ class ViewProperty extends Component {
                             </div>
                             <div className="col-sm-10 nameview">
                                 <div>
-                                    {/* <Link to={} data-id={property._id}> Property {property._id} </Link> */}
+                                  
                                     <Link  to={{
                                         pathname: "/bookProperty",
                                          state: {

@@ -67,7 +67,7 @@ export default class PropertyDetails extends Component {
                             </div>
                             <div className="row">
                                 <input type="text" class="form-control" name="headline"
-                                    placeholder="Headline" onChange={this.handleStateChange} value={this.state.headline}  />
+                                    placeholder="property name" onChange={this.handleStateChange} value={this.state.headline}  />
                                 <div id="headline-error" class="error"></div>
                             </div>
 

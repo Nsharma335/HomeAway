@@ -184,7 +184,7 @@ render() {
     }
     else{
         console.log("else image")  
-             imagelist=<img src= { require('../images/default-image.jpg') } width="150px" height="150px" ></img>
+             imagelist=<img src= { require('../images/default-property.png') } width="150px" height="150px" ></img>
     }
 
         return (

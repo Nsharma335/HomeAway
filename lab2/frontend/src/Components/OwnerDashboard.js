@@ -6,18 +6,44 @@ import HeaderOwner from './HeaderOwner';
 import Moment from 'react-moment';
 import { connect } from 'react-redux';
 import {Redirect} from 'react-router'; 
+import Pagination from './Pagination'
+import { Link } from "react-router-dom";
 
 class OwnerDashboard extends Component {
     constructor() {
         super();
         this.state = {
             data: [],
-            message: ""
+            message: "",
+            currentPage: 1, perPageRows: 5,
+            photos: [],
+            searchedName:"",
+            propertyArray2:[],
         };
+        this.handlePageChange= this.handlePageChange.bind(this);
+        this.handleNextPaginationButton= this.handleNextPaginationButton.bind(this);
+        this.handlePrevPaginationButton= this.handlePrevPaginationButton.bind(this);
+        this.serachedNameHandler=this.serachedNameHandler.bind(this);
+        this.searchByName=this.searchByName.bind(this);
     }
-  
+    handlePageChange(e) {
+        this.setState({currentPage: Number(e.target.dataset.id)})
+      }
+    
+      handleNextPaginationButton(e) {
+        const total_pages = this.state.data.length > 0 ? this.state.data.length/this.state.perPageRows : 0;
+        if(this.props.searchResults  != [] && this.state.currentPage != Math.ceil(total_pages)){
+          this.setState({currentPage: Number(this.state.currentPage + 1)})      
+        }
+      }
+    
+      handlePrevPaginationButton(e) {
+        if(this.props.searchResults != [] && this.state.currentPage != 1){
+          this.setState({currentPage: Number(this.state.currentPage - 1)})
+        }
+      }
 
-    componentDidMount() {
+    componentWillMount() {
         if (this.props.authFlag)
             this.loadOwnerPropertyDetails();
         else
@@ -43,7 +69,8 @@ class OwnerDashboard extends Component {
                     if (response.data.updatedList.rows != null) {
                         console.log("response from backedn",response.data.updatedList.rows);
                         self.setState({
-                            data: response.data.updatedList.rows
+                            data: response.data.updatedList.rows,
+                            propertyArray2: response.data.updatedList.rows
                         })
                     }
                     if (response.data.updatedList.status === 204) {
@@ -54,20 +81,70 @@ class OwnerDashboard extends Component {
                 })
         }
     }
+
+    serachedNameHandler(e){
+        this.setState({searchedName:e.target.value})
+    }
+    searchByName(){
+        let propertyList=this.state.data;
+      console.log(propertyList)
+        let newNames=[];
+        let newProperty=[];
+        let names= propertyList.map(property=>{
+            let headline=property.headline;
+            console.log("prop headline",headline)
+            console.log("prop headline serached name with",this.state.searchedName)
+            if(this.state.searchedName.match(headline))
+            {
+                console.log("inside if",headline)
+             newNames.push(headline);
+             newProperty.push(property);
+            }
+        })
+        //if(names.co)
+        console.log("names",names)
+        console.log("new names",newNames)
+        console.log("new property",newProperty)
+        this.setState({data:newProperty})
+        if(this.state.searchedName=="")
+        this.setState({data:this.state.propertyArray2})
+    }
+
     render() {
-        console.log("this.state.data---> ",this.state.data.length)
-        let propertytList;
-        propertytList = this.state.data.map(property => {
+        let propertytList, pagination_list=null;
+        const indexOfLastTodo = this.state.currentPage * this.state.perPageRows;
+        const indexOfFirstTodo = indexOfLastTodo - this.state.perPageRows;
+        const currentTodos = this.state.data.slice(indexOfFirstTodo, indexOfLastTodo);
+        const total_pages = this.state.data.length > 0 ? this.state.data.length/this.state.perPageRows : 0;
+        const page_numbers = [];
+        for (let i = 1; i <= Math.ceil(this.state.data.length / this.state.perPageRows); i++) {
+          page_numbers.push(i);
+        } 
+          pagination_list = page_numbers.map(number => {
+            return (
+              <li class="page-item" key= {number} data-id={number} onClick={this.handlePageChange} ><a data-id={number} class="page-link" href="#">{number}</a></li>
+            );
+          });
+          if(currentTodos != null){
+        propertytList = currentTodos.map(property => {
+            var image_tag = null;
+            console.log("property",property.images)
+            console.log("headline",property.headline)
+            console.log("address",property.address)
+            if(property.images.length >0){
+                var splitimage=property.images.split(",")
+                image_tag = <img  src= { require('../../../backend/uploads/' + splitimage[0]) } width="150px" height="150px" ></img>            
+              }
+              else{
+                image_tag = <img src= { require('../images/default-property.png') } width="150px" height="150px" ></img>
+              }
             return (
                 <div>
-
-                  
-                    <div className="container-fluid" style={{
+           <div className="container-fluid" style={{
                         borderRadius: "5px",
                         marginBottom: "20px",
                         width: "90%",
                         backgroundColor: "white",
-                       
                         boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"
 
                     }}>
@@ -75,12 +152,13 @@ class OwnerDashboard extends Component {
                       
                         
                             <div className="col-sm-2" >
-                                {/* <img src={require(`../Components/uploads/${property.images}`)} height="100px" /> */}
+                            {image_tag}
+
                             </div>
                             <div className="col-sm-10 nameview">
-                                <div>
+                                {/* <div>
                                     <a href="#" onClick={this.handleOnClickProperty} data-id={property.propertyId}> {property.propertyId} </a>
-                                </div>
+                                </div> */}
                                 <div className="displayRow">
                                     <div id="below">{property.headline}</div>
                                     <div className="belowTitleView"><strong>{property.bedroom}</strong> BHK accomodates by </div>
@@ -113,14 +191,16 @@ class OwnerDashboard extends Component {
                    
                         <HeaderOwner />
                         <div className="container-fluid" style={{marginLeft: "50px"}}>
-                        <input type="text" name="search" style={{width:"400px"}} placeholder="Search property by name" />
-                        <button  class="btn btn-primary">Search</button>
+                        <input type="text" name="searchedName" style={{width:"400px"}}onChange={this.serachedNameHandler} placeholder="Search property by name" />
+                        <button  onClick={this.searchByName}class="btn btn-primary">Search</button>
                         </div>
                       
                                 
                         <p></p> <p></p>
                         {propertytList}
                     </div>
+                    <Pagination handlePrevPaginationButton = {this.handlePrevPaginationButton.bind(this)} handleNextPaginationButton = {this.handleNextPaginationButton.bind(this)}
+          handlePageChange = {this.handlePageChange.bind(this)} pagination_list = {pagination_list}/>
                 </div >
             )
         }
@@ -131,14 +211,14 @@ class OwnerDashboard extends Component {
                     <div className="col-md-10 form-group" style={{ textAlign: "center", margin: "100px" }}>
                         <h2> You Haven't listed anything, Start listing your property.
                                 <br></br>
-                            <a href="/listYourProperty">Here</a></h2>
+                            <Link to="/listYourProperty">Here</Link></h2>
                     </div>
                 </div >
             )
         }
     }
 }
-
+}
 
 const mapStateToProps = state =>{
     console.log("State auth", state)
