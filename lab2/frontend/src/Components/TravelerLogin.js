@@ -12,8 +12,8 @@ class TravelerLogin extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            email: this.props.signInEmail,
-            password: this.props.signInPassword,
+            email: "",
+            password: "",
            //authFlag : this.props.authFlag
         };
         this.passwordChangeHandler = this.passwordChangeHandler.bind(this);
@@ -34,20 +34,7 @@ class TravelerLogin extends Component {
             document.getElementById("password-error").innerHTML = "";
     }
 
-    validateEmail(email){
-        if (email.trim() == "") {
-            document.getElementById("email-error").innerHTML = "Please enter your email address";
-            return false;
-        }
-        return true;
-    }
-    validatePassword(password){
-        if (password.trim() == "") {
-            document.getElementById("password-error").innerHTML = "Please enter your password";
-            return false;
-        }
-        return true;
-    }
+   
 
     submitLogin = (e) => {
         //prevent page from refresh
@@ -62,6 +49,20 @@ class TravelerLogin extends Component {
         let passwordErrorPresent = !this.validatePassword(this.state.password) ? true : false;
         emailErrorPresent || passwordErrorPresent? "" : this.props.onSubmitHandle(data);
         
+    }
+    validateEmail(email){
+        if (email == "") {
+            document.getElementById("email-error").innerHTML = "Please enter your email address";
+            return false;
+        }
+        return true;
+    }
+    validatePassword(password){
+        if (password == "") {
+            document.getElementById("password-error").innerHTML = "Please enter your password";
+            return false;
+        }
+        return true;
     }
 
 
@@ -136,7 +137,7 @@ const mapDispatchStateToProps = dispatch => {
 
         onSubmitHandle : (data) => {
            
-            axios.post('http://localhost:3001/login', data,{ withCredentials: true })
+            axios.post('http://13.57.198.197:3001/login', data,{ withCredentials: true })
                 .then((response) => {
                     console.log("response got from Kafkaa... ",response)
                     localStorage.setItem("token",response.data.updatedList.token)
