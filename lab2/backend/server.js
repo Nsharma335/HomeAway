@@ -1,5 +1,4 @@
 'use strict';
-// Include our packages in our main server file
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
@@ -8,23 +7,12 @@ var passport = require('passport');
 var cors = require('cors');
 var port = 8080;
 var app = express();
-var config = require('./settings');
-var jwt = require('jsonwebtoken');
-var crypt = require('./crypt');
 var db = require('./db');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 var cookieParser = require('cookie-parser');
 var kafka = require("./kafka/client")
-
-
-
-// var dir = './profileImage';
-
-// if (!fs.existsSync(dir)) {
-//     fs.mkdirSync(dir);
-// }
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -37,26 +25,18 @@ const storage = multer.diskStorage({
 });
 
 var upload = multer({ storage });
-
-
-
 // Use body-parser to get POST requests for API use
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
-
 // Log requests to console
 app.use(morgan('dev'));
-
 console.log("here");
 //require('./app/routes')(app);
 app.use(passport.initialize());
 app.use(passport.session());
-
 // Bring in defined Passport Strategy
 require('./passport')(passport);
-
-// Set up middleware
 var requireAuth = passport.authenticate('jwt', { session: false });
 
 app.use(function (req, res, next) {
@@ -110,8 +90,6 @@ app.post('/download/:file(*)', (req, res) => {
     res.writeHead(200, { 'Content-Type': 'image/jpg' });
     res.end(JSON.stringify(base64imagesArray));
 });
-
-
 
 app.post('/register', function (request, response) {
     console.log("Registering New User...")
@@ -224,9 +202,6 @@ app.post('/searchProperty', function (request, response) {
             } 
     });
 });
-
-
-
 
 app.post('/searchPropertyWithFilters', function (request, response) {
     console.log("Request search property for User : " );
@@ -385,8 +360,6 @@ app.post('/sendMessage', function (request, response) {
     });
 
 });
-
-
 app.get('/getMessage', function (request, response) {
     console.log("fetching message to owner... " + request.query.id)
     console.log("fetching message to owner... " + request.query.email)
@@ -399,36 +372,8 @@ app.get('/getMessage', function (request, response) {
 
     }, function (err) {
         console.log(err);
-        return response.status(400).json({ success: false, message: "Coudn't read messages" });
     });
 
 });
-
-// app.post('/sendMessageToOwner', function (request, response) {
-//     console.log("Sending message to owner... " + request.body)
-
-//     var messageObject = {
-//         propertyId: request.body.propertyId,
-//         firstName: request.body.firstName,
-//         lastName: request.body.lastName,
-//         travelerEmail: request.body.travelerEmail,
-//         messageData: request.body.message
-//     };
-
-//     console.log(messageObject);
-
-//     db.SendMessageToOwner(messageObject, function (res) {
-//         console.log("Message data",res)
-//         response.status(201).json({ success: true, message: 'Message sent.' });
-//     }, function (err) {
-//         console.log(err);
-//         return response.status(400).json({ success: false, message: "Coudn't send messages" });
-//     });
-
-// });
-
-
-
-//start your server on port 3001
 app.listen(3001);
 console.log("Server Listening on port 3001");

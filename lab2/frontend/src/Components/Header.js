@@ -67,7 +67,7 @@ class Header extends Component {
                         <li>
                             <button class="btn navbar-btm">
                                 <Link  to="/travelerTrips">
-                                <span>My Trips</span>
+                                <span>My Dashboard</span>
                             </Link>
                             </button>
                         </li>

@@ -38,14 +38,39 @@ export default class PropertyDetails extends Component {
         console.log("field value" + this.props.fieldValues)
         this.props.saveFields(data);
         let validateHeadlineError = !this.validateHeadline(this.state.headline) ? true : false;
-        validateHeadlineError ? "" : this.props.nextStep();
-        this.props.nextStep();
+        let validateBedroomError = !this.validateBedroom(this.state.bedroom) ? true : false;
+        let validateGuestError = !this.validateGuest(this.state.accomodates) ? true : false;
+        let validateBathroomError = !this.validateBathroom(this.state.bathroom) ? true : false;
+        validateHeadlineError|| validateBedroomError|| validateGuestError || validateBathroomError ? "" : this.props.nextStep();
+       
 
     }
 
     validateHeadline(headline){
         if (headline.trim() == "") {
             document.getElementById("headline-error").innerHTML = "Please enter the headline";
+            return false;
+        }
+        return true;
+    }
+    validateBedroom(headline){
+        if (headline.trim() == "") {
+            document.getElementById("bedroom-error").innerHTML = "Please enter number of bedrooms";
+            return false;
+        }
+        return true;
+    }
+
+    validateGuest(headline){
+        if (headline.trim() == "") {
+            document.getElementById("guest-error").innerHTML = "Please enter number of guests";
+            return false;
+        }
+        return true;
+    }
+    validateBathroom(headline){
+        if (headline.trim() == "") {
+            document.getElementById("bathroom-error").innerHTML = "Please enter number of bathrooms";
             return false;
         }
         return true;
@@ -101,11 +126,12 @@ export default class PropertyDetails extends Component {
                                     <option value="9">9</option>
                                 </select>
                             </div>
+                            <div id="bedroom-error" class="error"></div>
                             <div className="row">
                                 <input onChange={this.handleStateChange} type="number" class="form-control" name="accomodates"
                                     placeholder="Accomodates" required="true" />
                             </div>
-                            <div id="accomodates-error" class="error"></div>
+                            <div id="guest-error" class="error"></div>
                             <div className="row">
                                 <select required className="form-control" name="bathroom" onChange={this.handleStateChange} >
                                     <option value="" disabled selected hidden>Bathrooms</option>
@@ -130,7 +156,7 @@ export default class PropertyDetails extends Component {
                                 </select>
                             </div>
 
-
+  <div id="bathroom-error" class="error"></div>
                             <div className="row">
                                 <textarea onChange={this.handleStateChange} class="form-control" rows="5" name="amenities" placeholder="List your Amenities"></textarea>
                             </div>
@@ -148,3 +174,5 @@ export default class PropertyDetails extends Component {
         )
     }
 }
+
+

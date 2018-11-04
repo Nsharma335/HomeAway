@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import axios from 'axios';
+import { connect } from 'react-redux';
 
-export default class Location extends Component {
+class Location extends Component {
     constructor() {
         super();
         this.state = {
@@ -70,6 +71,7 @@ export default class Location extends Component {
     }
 
     render() {
+        if(this.props.authFlag){
         return (
             <div>
                 <div class="container" style={{ backgroundColor: "#eee" }}>
@@ -110,4 +112,25 @@ export default class Location extends Component {
             </div>
         )
     }
+    else
+    {
+        return(
+
+            <div>
+                 <center ><div style={{color:"grey"}}>You are not authorized to view this page, Please login as owner to continue.</div></center>
+                
+         </div>
+        )
+    }
 }
+}
+
+const mapStateToProps = state =>{
+    console.log("State", state)
+    console.log("State user", state.authFlag)
+    return {
+        authFlag : state.authFlag,
+    }
+}
+
+export default connect(mapStateToProps)(Location);

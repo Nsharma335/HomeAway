@@ -19,6 +19,7 @@ class OwnerDashboard extends Component {
             photos: [],
             searchedName:"",
             propertyArray2:[],
+            noResults:false,
         };
         this.handlePageChange= this.handlePageChange.bind(this);
         this.handleNextPaginationButton= this.handleNextPaginationButton.bind(this);
@@ -96,15 +97,13 @@ class OwnerDashboard extends Component {
             console.log("prop headline serached name with",this.state.searchedName)
             if(this.state.searchedName.match(headline))
             {
-                console.log("inside if",headline)
-             newNames.push(headline);
              newProperty.push(property);
             }
+            else{
+                this.setState({noResults:true})
+            }
         })
-        //if(names.co)
-        console.log("names",names)
-        console.log("new names",newNames)
-        console.log("new property",newProperty)
+       
         this.setState({data:newProperty})
         if(this.state.searchedName=="")
         this.setState({data:this.state.propertyArray2})
@@ -204,7 +203,16 @@ class OwnerDashboard extends Component {
                 </div >
             )
         }
+        else if(this.state.noResults){
+            return(
+                <div>
+                     <HeaderOwner />
+            <center ><div style={{color:"grey"}}>No matching results</div></center>
+            </div>
+            )
+        }
         else{
+
             return (
                 <div>
                      <HeaderOwner />

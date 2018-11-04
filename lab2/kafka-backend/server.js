@@ -10,7 +10,8 @@ var getUserDetails = require("./services/getUserDetails");
 var bookProperty = require("./services/bookProperty");
 var travelerBookings = require("./services/travelerBookings");
 var searchWithFilters = require("./services/searchWithFilters");
-var sendMessageToOwner = require("./services/sendMessageToOwner");
+var sendMessage = require("./services/sendMessage");
+var getMessage = require("./services/getMessage");
 
 function handleTopicRequest(topic_name, fname) {
   //var topic_name = 'root_topic';
@@ -54,4 +55,5 @@ handleTopicRequest("get_user_details_topic", getUserDetails);
 handleTopicRequest("book_property_topic", bookProperty);
 handleTopicRequest("traveler_bookings_topic",travelerBookings);
 handleTopicRequest("filter_property_topic", searchWithFilters);
-handleTopicRequest("send_message_to_owner_topic", sendMessageToOwner);
+handleTopicRequest("send_message_to_owner_topic", sendMessage);
+handleTopicRequest("get_message_topic", getMessage);

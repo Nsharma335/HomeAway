@@ -32,19 +32,17 @@ componentDidMount(){
     if (id != null) {
     axios.get('http://localhost:3001/getMessage?email='+id).then(response=>
     {
-    console.log("response",response.data.res.MessageData)
+        console.log(response)
+        if(response.data.updatedList.rows!=null){
+    console.log("response",response.data.updatedList.rows.MessageData)
     this.setState({
-    messages : response.data.res.MessageData
-    })   
+    messages : response.data.updatedList.rows.MessageData
+    })   }
 //handle when no response found , show no messages validation, check length of response
     console.log("messages queue-->",this.state.messages)
 })
 }
 }
-
-
-
-
 
   render() {
 

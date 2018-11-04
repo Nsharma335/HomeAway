@@ -85,27 +85,6 @@ class ListYourProperty extends Component {
             fieldValues: copydata
         });
     }
-    // saveImage(fields) {
-    //     var self = this;
-    //     console.log("data from child state" + fields.selectedFiles[0]);
-    //     var images = self.state.images;
-    //     var images = [];
-    //     var selectedFiles = []
-    //     selectedFiles = this.state.fieldValues.selectedFiles;
-    //     for (var i = 0; i < fields.selectedFiles.length; i++) {
-    //         console.log("fields name" + fields.selectedFiles[i].name);
-    //         // var join =this.state.selectedFiles.concat(...fields.selectedFiles)
-    //         images = images.concat(fields.selectedFiles[i].name.concat(","))
-    //         // this.setState({ imagesNames: addImage })
-    //     }
-    //     console.log("add images");
-    //     console.log(images.slice(0, -1));
-    //     console.log("images n names.." + images);
-    //     self.setState({ images })
-    //     console.log("this.images-> ", this.state.images)
-    //     console.log("Parent state of address " + this.state.fieldValues.address);
-
-    // }
     nextStep() {
         this.setState({
             step: this.state.step + 1

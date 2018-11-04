@@ -54,21 +54,17 @@ import swal from 'sweetalert2'
         this.setState({ email: e.target.value });
         e.target.value == "" ? document.getElementById("email-error").innerHTML = "Please enter your email address." :
             document.getElementById("email-error").innerHTML = "";
-        const regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        if (!regex.test(String(this.state.email).toLowerCase())) {
-            document.getElementById("email-error").innerHTML = "Please enter valid email address";
-            return false;
-        }
+        // const regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        // if (!regex.test(String(this.state.email).toLowerCase())) {
+        //     document.getElementById("email-error").innerHTML = "Please enter valid email address";
+        //     return false;
+        // }
     }
     phoneNumberChangeHandler(e) {
         this.setState({ phoneNumber: e.target.value });
         e.target.value == "" ? document.getElementById("phoneNumber-error").innerHTML = "Please enter your phone number." :
             document.getElementById("phoneNumber-error").innerHTML = "";
-        const regex = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/;
-        if (!regex.test(String(this.state.phoneNumber))) {
-            document.getElementById("phoneNumber-error").innerHTML = "Please enter valid phone number.";
-            return false;
-        }
+        
     }
     commentChangeHandler(e) {
         this.setState({ comment: e.target.value });
@@ -92,15 +88,11 @@ import swal from 'sweetalert2'
         this.setState({ gender: e.target.value });
     }
     componentDidMount() {
-    console.log("componentWillMount of UserProfile")
-     if(this.props.authFlag)
-     { 
-         this.loadUserDetails();
-     }
-     else
-     <Redirect to="/" />
+    console.log("componentWillMount of UserProfile",this.props.authFlag)
+    this.loadUserDetails();
 
     }
+
 
     loadUserDetails() {
         console.log("loading details function called...")
@@ -161,11 +153,28 @@ import swal from 'sweetalert2'
                 languages: this.state.languages,
                 gender: this.state.gender
             };
-           this.props.onSubmitHandle(data)
+
+            let validatePhoneError = !this.validatePhone(this.state.phoneNumber) ? true : false;
+            validatePhoneError ? "" : this.props.onSubmitHandle(data)
+  
+        }
+        else{
+            swal("You are not logged in, please login to update profile.")
         }
     }
 
+    validatePhone(phone){
+    let regex= /^\d{10}$/;
+    if(!regex.test(phone))    
+        {    
+            document.getElementById("phoneNumber-error").innerHTML = "Please enter valid phone number of 10 digits";
+            return false;
+        }
+    return true
+    }
+
     render() {
+       
         return (
           
             <React.Fragment>
@@ -258,6 +267,9 @@ import swal from 'sweetalert2'
 
             </React.Fragment >
         )
+                
+
+               
     }
 
 }
@@ -288,7 +300,7 @@ const mapStateToProps = state =>{
                          }
                     if (response.data.updatedList.status === 400) {
 
-                    swal("Couldn't able to update the profile", "Internal server error.", 'error');
+                    swal("Please check your fields type", "Not able to update field", 'error');
                         }
 
                         console.log("response fetched..", response.data.resData)
