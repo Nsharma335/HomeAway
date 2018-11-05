@@ -25,8 +25,10 @@ componentDidMount(){
     })
    var id=null;
     let userid= this.props.userinfo.map(user=> {
+        if(user!=null){
         console.log("inside map email",user.email)
         id = user.email
+        }
     })
     console.log("user email id fetched from store..",id)
     if (id != null) {
